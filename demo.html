@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>demo</title>
+	<meta charset="utf-8" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="leaflet/leaflet.css" />
+	<link rel="stylesheet" href="demo.css" />
+	<script src="demo.js"></script>
+</head>
+<body>
+	<div id="map"></div>
+
+	<script src="leaflet/leaflet.js"></script>
+	<script>
+	initMap();	
+	</script>
+
+	<div id="left-sidebar">
+		<div id="input-panel" class="panel">
+			<div class="panel-header">
+				<div id="left-cancel" class="panel-cancel"></div>
+				<div class="panel-title">输入信息</div>
+			</div>
+			<div class="panel-body">
+				<div class="input-area">
+					<label for="start-input">起点： </label>
+					<input id="start-input" name="start-input" class="input-text" type="text" placeholder="请输入起点" />
+					<a class="button right-button" onclick="showMarker(0)">显示</a>
+				</div>
+				<div class="input-area">
+					<label for="end-input">终点： </label>
+					<input id="end-input" name="end-input" class="input-text" type="text" placeholder="请输入终点" />
+					<a class="button right-button" onclick="showMarker(1)">显示</a>
+				</div>
+				<div class="button-area">
+					<a class="button left-button" id="reset-button" onclick="reset()">重置</a>
+					<select id="route-seletor">
+						<option value="0">HANA导航</option>
+						<option value="1">高德导航</option>
+						<option value="2">百度导航</option>
+					</select>
+					<a class="button right-button" id="reverse-button" onclick="reserve()">互换</a>
+				</div>
+			</div>
+		</div>
+		<div id="output-panel" class="panel">
+			<div class="panel-header">
+				<div class="panel-title">输出信息</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="right-sidebar">
+		<div id="url-panel" class="panel">
+			<div class="panel-header">
+				<div id="right-cancel" class="panel-cancel"></div>
+				<div class="panel-title">自定义底图</div>
+			</div>
+			<div class="panel-body">
+				<!-- <form id="add-url-form" method="get" action="addURL()"> -->
+				<div class="input-area">
+					<label for="name-input">名称： </label>
+					<input id="name-input" name="name-input" class="input-text" type="text" placeholder="请输入底图名称" />
+				</div>
+				<div class="input-area">
+					<label for="url-input">URL： </label>
+					<input id="url-input" name="url-input" class="input-text" type="text" placeholder="请输入底图URL" required />
+				</div>
+				<div class="button-area">
+					<a class="button right-button" id="add-url-button" onclick="addURL()">添加底图</a>
+					<!-- <input type="submit" class="button right-button" > -->
+				</div>
+				<!-- </form> -->
+			</div>
+		</div>
+	</div>
+</body>
+</html>

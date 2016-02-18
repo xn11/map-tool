@@ -1,0 +1,158 @@
+
+/*底图全屏显示，设置default背景图片*/
+html, body
+{
+	padding: 0;
+	margin: 0;
+	height: 100%;
+	overflow:hidden;
+	font: 12px 微软雅黑,黑体,Arial,Tahoma,sans-serif,serif;
+}
+#map
+{
+	height: 100%;
+	z-index: 0;
+	background: #00FF00 url('mapNanjingDark3/n/n/n.png') repeat;
+}
+
+/* 左边栏 */
+#left-sidebar
+{
+	width: 350px;
+	top: 5px;
+	bottom: 150px;	
+	/* height: 500px; */
+	left: 5px;
+	position: absolute;
+	border-radius:10px;
+	-moz-border-radius:10px;
+	-webkit-border-radius:10px;
+	background-color:rgba(0, 0, 0, 0.25);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#3f000000, endColorstr=#3f000000);	
+}
+.panel
+{
+	position:absolute;
+	background-color:#ffffff;	
+	border-radius:8px;
+	-moz-border-radius:8px;
+	-webkit-border-radius:8px;	
+	margin:5px;
+	padding:5px;	
+}
+.panel-cancel
+{
+	cursor: pointer;
+	width: 20px;
+	height: 20px;
+	background: url("images/cancel.png") no-repeat center;
+	float: right;
+	vertical-align: top;
+}
+.panel-title
+{
+	top: 12px;
+	position: relative;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+/* 输入部分 */
+#input-panel
+{
+	width:330px;
+	height:140px;
+}
+#output-panel
+{
+	width:330px;
+	/* height:315px; */
+	bottom: 0px;
+	top: 155px;
+}
+.panel-header
+{
+	left:0px;
+	right:0px;
+	top:0px;
+	height:40px;
+}
+.input-area
+{
+	padding: 0 0 8px 10px;
+}
+.button-area
+{
+	padding-top: 5px;
+}
+.input-text
+{
+	font-size: 12px;
+	width: 205px;
+	height: 18px;
+	padding-left: 5px;
+}
+
+/* 按钮 */
+.button
+{
+	cursor: pointer;
+	padding: 0 10px;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	text-decoration: none;
+	outline-style: none;
+	vertical-align: 1px;	
+	/*font-family: Verdana, Arial, Helvetica, sans-serif;*/
+	background: #88C5E1;
+	color: #fff;	
+	font-size: .875rem;
+	line-height: 24px;
+}
+.right-button
+{
+	float: right;
+	margin-right: 10px;
+}
+.left-button
+{
+	float: left;
+	margin-left: 10px;
+}
+#route-seletor{
+	margin: 2px 0 0 60px;
+    border: 0;
+    font: 12px 微软雅黑,黑体,Arial,Tahoma,sans-serif,serif;
+}
+
+/* 右边栏 */
+#right-sidebar
+{
+	width: 400px;
+    height: 155px;
+    bottom: 20px;
+	right: 5px;
+	position: absolute;
+	border-radius:10px;
+	-moz-border-radius:10px;
+	-webkit-border-radius:10px;
+	background-color:rgba(0, 0, 0, 0.25);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#3f000000, endColorstr=#3f000000);	
+}
+#url-panel
+{
+	width:380px;
+	height:135px;
+}
+#url-panel input{
+	width: 310px
+}
+/* input:required:invalid {
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAALCAMAAACecocUAAAAGXRFW…qwe4mwR+jWmmeM4PP7950vBnH3WPb3MUax3JIxEPwJMACNoAYZaJlHoAAAAABJRU5ErkJggg==);
+    background-position: right center;
+    background-repeat: no-repeat;
+    border-color: red;
+    box-shadow: none;
+    -moz-box-shadow: none;
+} */
