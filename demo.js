@@ -4,10 +4,7 @@ var map,startMarker,endMarker,polyline;
 function initMap(){
 	var mbAttr = '&copy; SAP NIC';
 
-	var osmde   = L.tileLayer('http://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {attribution: mbAttr}),
-	osm  = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: mbAttr}),
-	local  = L.tileLayer('mapNanjingDark3/{z}/{x}/{y}.png', {attribution: mbAttr})
-	;
+	var osm  = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: mbAttr});
 
 	map = L.map('map', {
 		center: [32.045115, 118.778601],
@@ -15,14 +12,16 @@ function initMap(){
 		minZoom: 11,
 		maxZoom: 17,
 		doubleClickZoom: false,
-		layers: [local]
+		layers: [osm]
 	});
 
-	var baseLayers = {
-		"local":local,
-		"osm.org": osm,
-		"osm.org.de": osmde
-	};
+	// var baseLayers = {
+	// 	"local":local,
+	// 	"osm.org": osm,
+	// 	"osm.org.de": osmde
+	// };
+
+	var baseLayers = getURL();
 
 	L.control.layers(baseLayers).addTo(map);
 
@@ -53,6 +52,31 @@ function initMap(){
 	endMarker.on('click', hideMarker);
 	endMarker.on('dragend',dragMarker);
 
+}
+
+function getURL(){
+	var mbAttr = '&copy; SAP NIC';
+
+	var osmde   = L.tileLayer('http://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {attribution: mbAttr}),
+	osm  = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: mbAttr}),
+	local  = L.tileLayer('mapNanjingDark3/{z}/{x}/{y}.png', {attribution: mbAttr});
+
+	var baseLayers = {
+		"local":local,
+		"osm.org": osm,
+		"osm.org.de": osmde
+	};
+
+	var storage = window.localStorage;
+	for (var i = 0; i < storage.length; i++) {
+		var url = storage.key(i);
+		var name = storage.getItem(url);
+
+		baseLayers[name] = L.tileLayer(url, {attribution: mbAttr});	
+		
+	};
+	alert(storage.length+"\n"+baseLayers);
+	return baseLayers;
 }
 
 function dragMarker(e){
@@ -189,23 +213,60 @@ function drawLine(marker_1,marker_2){
 	var pathLine = L.polyline(c).addTo(map);
 }*/
 
+function clearURL(){
+	window.localStorage.clear();
+	alert("清空成功！");
+}
+
 function addURL(){
 	var name = document.getElementById("name-input").value.trim();
 	var url = document.getElementById("url-input").value.trim();
+	var urlInput = document.getElementById("url-input");
 
 	if(url==""){
-		alert("请输入底图URL");
+		// document.getElementById("url-input").style.outline = "#EE9A49 auto 5px";
+		addClass(urlInput, "empty-input");
 		return;
+	}else{
+		removeClass(urlInput, "empty-input");
 	}
 
 	if(name==""){
 		name = url.length <= 25? url: url.substring(0,25);
 	}
 
+	var storage = window.localStorage;
+	storage.setItem(url, name);
 	
 
-	alert(name);
+	alert(storage.getItem(url));
 
-	document.getElementById("name-input").value = "";
-	document.getElementById("url-input").value = "";
+	// document.getElementById("name-input").value = "";
+	// document.getElementById("url-input").value = "";
+	 window.location.reload();
 }
+
+
+
+
+
+
+
+
+
+/****通用工具类*****************************************************************************/
+
+function hasClass(obj, cls) {  
+    return obj.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'));  
+}  
+  
+function addClass(obj, cls) {  
+    if (!this.hasClass(obj, cls)) obj.className += " " + cls;  
+}  
+  
+function removeClass(obj, cls) {  
+    if (hasClass(obj, cls)) {  
+        var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)');  
+        obj.className = obj.className.replace(reg, '');  
+    }  
+}  

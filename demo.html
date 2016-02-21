@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -37,7 +36,7 @@
 					<a class="button right-button" onclick="showMarker(1)">显示</a>
 				</div>
 				<div class="button-area">
-					<a class="button left-button" id="reset-button" onclick="reset()">重置</a>
+					<a class="button left-button grey-button" id="reset-button" onclick="reset()">重置</a>
 					<select id="route-seletor">
 						<option value="0">HANA导航</option>
 						<option value="1">高德导航</option>
@@ -71,7 +70,8 @@
 					<input id="url-input" name="url-input" class="input-text" type="text" placeholder="请输入底图URL" required />
 				</div>
 				<div class="button-area">
-					<a class="button right-button" id="add-url-button" onclick="addURL()">添加底图</a>
+					<a class="button right-button" id="add-url-button" onclick="addURL()">添加底图</a>					
+					<a class="button right-button grey-button" id="clear-url-button" onclick="clearURL()">清空底图</a>
 					<!-- <input type="submit" class="button right-button" > -->
 				</div>
 				<!-- </form> -->

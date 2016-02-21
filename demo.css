@@ -125,6 +125,9 @@ html, body
     border: 0;
     font: 12px 微软雅黑,黑体,Arial,Tahoma,sans-serif,serif;
 }
+.grey-button{
+	background: #C1C1C1	;
+}
 
 /* 右边栏 */
 #right-sidebar
@@ -156,3 +159,7 @@ html, body
     box-shadow: none;
     -moz-box-shadow: none;
 } */
+
+.empty-input{
+	outline: #EE9A49 auto 5px;
+}
