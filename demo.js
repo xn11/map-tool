@@ -51,7 +51,6 @@ function initMap(){
 	startMarker.on('dragend',dragMarker);
 	endMarker.on('click', hideMarker);
 	endMarker.on('dragend',dragMarker);
-
 }
 
 function getURL(){
@@ -75,7 +74,6 @@ function getURL(){
 		baseLayers[name] = L.tileLayer(url, {attribution: mbAttr});	
 		
 	};
-	alert(storage.length+"\n"+baseLayers);
 	return baseLayers;
 }
 
@@ -205,17 +203,32 @@ function drawLine(marker_1,marker_2){
 	map.addLayer(polyline);
 }
 
-/*function linestring(){
-	var c = [];
-	c.push(startMarker.latlng);
-	c.push(endMarker.latlng);
+function drawGeojson(json){
+	var route = {
+		"type": "FeatureCollection",
+		"features": [
+		{
+			"type": "Feature",
+			"geometry": {
+				"type": "LineString",
+				"coordinates": json
+			},
+			"properties": {
+				"popupContent": "This is free bus that will take you across downtown.",
+				"underConstruction": false
+			},
+			"id": 1
+		}
+		]
+	};
 
-	var pathLine = L.polyline(c).addTo(map);
-}*/
+	L.geoJson(route).addTo(map);
+}
 
 function clearURL(){
 	window.localStorage.clear();
 	alert("清空成功！");
+	window.location.reload();
 }
 
 function addURL(){
@@ -243,11 +256,15 @@ function addURL(){
 
 	// document.getElementById("name-input").value = "";
 	// document.getElementById("url-input").value = "";
-	 window.location.reload();
+	window.location.reload();
 }
 
-
-
+/****导航服务商onChange()*****/
+function reRoute(){
+	var selector = document.getElementById("route-seletor");
+	var text = selector.options[selector.selectedIndex].text;
+	alert(text);
+}
 
 
 

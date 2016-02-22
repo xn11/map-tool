@@ -36,13 +36,14 @@
 					<a class="button right-button" onclick="showMarker(1)">显示</a>
 				</div>
 				<div class="button-area">
-					<a class="button left-button grey-button" id="reset-button" onclick="reset()">重置</a>
-					<select id="route-seletor">
+					<!-- <a class="button left-button grey-button" id="reset-button" onclick="reset()">重置</a> -->
+					<select id="route-seletor" onChange="reRoute()">
 						<option value="0">HANA导航</option>
 						<option value="1">高德导航</option>
 						<option value="2">百度导航</option>
 					</select>
 					<a class="button right-button" id="reverse-button" onclick="reserve()">互换</a>
+					<a class="button right-button grey-button" id="reset-button" onclick="reset()">重置</a>
 				</div>
 			</div>
 		</div>
