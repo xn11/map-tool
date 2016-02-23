@@ -1,5 +1,5 @@
 
-var map,startMarker,endMarker,polyline;
+var map,startMarker,endMarker,polyline,routeline;
 
 function initMap(){
 	var mbAttr = '&copy; SAP NIC';
@@ -9,7 +9,7 @@ function initMap(){
 	map = L.map('map', {
 		center: [32.045115, 118.778601],
 		zoom: 13,
-		minZoom: 11,
+		/*minZoom: 11,*/
 		maxZoom: 17,
 		doubleClickZoom: false,
 		layers: [osm]
@@ -204,7 +204,7 @@ function drawLine(marker_1,marker_2){
 }
 
 function drawGeojson(json){
-	var route = {
+	/*var route = {
 		"type": "FeatureCollection",
 		"features": [
 		{
@@ -222,7 +222,26 @@ function drawGeojson(json){
 		]
 	};
 
-	L.geoJson(route).addTo(map);
+	L.geoJson(route).addTo(map);*/
+
+	routeline = [{
+		"type": "LineString",
+		"coordinates": json
+	}];
+
+	var myStyle = {
+		"color": "#FF7F00",
+		"weight": 5,
+		/*"dashArray": "8,6",*/
+		"opacity": 0.65
+	};
+
+	map.removeLayer(routeline);
+
+	L.geoJson(routeline, {
+		style: myStyle
+	}).addTo(map);
+
 }
 
 function clearURL(){
@@ -263,7 +282,43 @@ function addURL(){
 function reRoute(){
 	var selector = document.getElementById("route-seletor");
 	var text = selector.options[selector.selectedIndex].text;
-	alert(text);
+	var value = selector.options[selector.selectedIndex].value;
+	// alert(selector.options[selector.selectedIndex].value);
+
+	if(value==1){
+		getLbsJson();
+		return;
+	}
+}
+
+function getLbsJson(){
+	var json = [];
+
+	var startPoint = [startMarker.getLatLng().lng, startMarker.getLatLng().lat];
+	var endPoint = [endMarker.getLatLng().lng, endMarker.getLatLng().lat];
+	json.push(startPoint);
+
+	AMap.service(["AMap.Driving"], function() {
+		var driveOptions = { 
+			panel: 'display-info',
+			city: '南京市',                          
+			policy: AMap.DrivingPolicy.LEAST_TIME 
+		};
+        //构造类
+        var drive = new AMap.Driving(driveOptions);
+        //根据起、终点坐标查询路线
+        drive.search(startPoint,endPoint , function(status, result){
+        	for (var i = 0; i < result.routes[0].steps.length; i++) {
+        		var endLoc = result.routes[0].steps[i].end_location;
+        		json.push([endLoc.lng,endLoc.lat]);
+        	};        	
+        	alert("json length: "+json.length);
+		drawGeojson(json);
+        });
+    });
+
+	
+	// return json;
 }
 
 

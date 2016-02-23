@@ -124,6 +124,7 @@ html, body
 	margin: 2px 0 0 50px;
     border: 0;
     font: 12px 微软雅黑,黑体,Arial,Tahoma,sans-serif,serif;
+    width: 120px;
 }
 .grey-button{
 	background: #C1C1C1	;
