@@ -12,7 +12,7 @@ html, body
 {
 	height: 100%;
 	z-index: 0;
-	background: #00FF00 url('mapNanjingDark3/n/n/n.png') repeat;
+	background: #00FF00 url('images/n.png') repeat;
 }
 
 /* 左边栏 */
@@ -20,7 +20,8 @@ html, body
 {
 	width: 350px;
 	top: 5px;
-	bottom: 150px;	
+	bottom: 30px;	
+	min-height: 250px;
 	/* height: 500px; */
 	left: 5px;
 	position: absolute;
@@ -69,6 +70,7 @@ html, body
 	/* height:315px; */
 	bottom: 0px;
 	top: 155px;
+	overflow: auto;
 }
 .panel-header
 {
@@ -163,4 +165,15 @@ html, body
 
 .empty-input{
 	outline: #EE9A49 auto 5px;
+}
+
+
+/***********高德API生成面板css****************************/
+.amap-lib-driving{
+	border: 0px;
+}
+
+.amap-lib-driving .planTitle{
+	/* border: 0px; */
+	background: #fff;
 }

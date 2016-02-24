@@ -1,6 +1,8 @@
+/****初始化*****************************************************************************/
 
 var map,startMarker,endMarker,polyline,routeline;
 
+//初始化地图
 function initMap(){
 	var mbAttr = '&copy; SAP NIC';
 
@@ -14,12 +16,6 @@ function initMap(){
 		doubleClickZoom: false,
 		layers: [osm]
 	});
-
-	// var baseLayers = {
-	// 	"local":local,
-	// 	"osm.org": osm,
-	// 	"osm.org.de": osmde
-	// };
 
 	var baseLayers = getURL();
 
@@ -45,14 +41,13 @@ function initMap(){
 	startMarker = L.marker([32.045115, 118.778601], {icon: startIcon,draggable:true});
 	endMarker = L.marker([32.045115, 118.778601], {icon: endIcon,draggable:true});
 
-	// var startLayer = L.layerGroup([setMarker]);
-
 	startMarker.on('click', hideMarker);
 	startMarker.on('dragend',dragMarker);
 	endMarker.on('click', hideMarker);
 	endMarker.on('dragend',dragMarker);
 }
 
+//从localstorage中获取自定义底图URL
 function getURL(){
 	var mbAttr = '&copy; SAP NIC';
 
@@ -69,6 +64,9 @@ function getURL(){
 	var storage = window.localStorage;
 	for (var i = 0; i < storage.length; i++) {
 		var url = storage.key(i);
+		if(url.indexOf(".png")<0){
+			continue;
+		}
 		var name = storage.getItem(url);
 
 		baseLayers[name] = L.tileLayer(url, {attribution: mbAttr});	
@@ -76,6 +74,40 @@ function getURL(){
 	};
 	return baseLayers;
 }
+
+
+function clearURL(){
+	window.localStorage.clear();
+	alert("清空成功！");
+	window.location.reload();	//刷新页面
+}
+
+function addURL(){
+	var name = document.getElementById("name-input").value.trim();
+	var url = document.getElementById("url-input").value.trim();
+	var urlInput = document.getElementById("url-input");
+
+	if(url==""||url.indexOf(".png")<0){
+		// document.getElementById("url-input").style.outline = "#EE9A49 auto 5px";
+		addClass(urlInput, "empty-input");
+		return;
+	}else{
+		removeClass(urlInput, "empty-input");
+	}
+
+	if(name==""){
+		name = url.length <= 25? url: url.substring(0,25);
+	}
+
+	var storage = window.localStorage;
+	storage.setItem(url, name);
+	
+
+	alert(storage.getItem(url));
+	window.location.reload();	//刷新页面
+}
+
+/****marker操作*****************************************************************************/
 
 function dragMarker(e){
 	var value = formatLatLng(e.target.getLatLng());
@@ -85,10 +117,7 @@ function dragMarker(e){
 		document.getElementById("end-input").value = value;
 	}
 	drawLine(startMarker,endMarker);
-}
-
-function formatLatLng(latlng){
-	return parseFloat(latlng.lat).toFixed(6) + ',' + parseFloat(latlng.lng).toFixed(4) ;
+	reRoute();
 }
 
 function handleMarker(marker_id, str){
@@ -135,6 +164,7 @@ function onMapClick(e) {
 
 	drawLine(startMarker,endMarker);
 	// map.setView(e.latlng);
+	reRoute();
 }
 
 function setMarker(marker_id, lat, lng){
@@ -145,6 +175,7 @@ function setMarker(marker_id, lat, lng){
 	map.addLayer(marker);
 	map.setView([lat,lng], 13);
 	drawLine(startMarker,endMarker);
+	reRoute();
 }
 
 function showMarker(marker_id){
@@ -152,16 +183,17 @@ function showMarker(marker_id){
 	var str = document.getElementById(inputId).value;
 	handleMarker(marker_id,str);
 }
-
+//重置按钮
 function reset(){
 	document.getElementById("start-input").value = "";
 	document.getElementById("end-input").value = "";
 	map.removeLayer(startMarker);
 	map.removeLayer(endMarker);
 	map.removeLayer(polyline);
+	map.removeLayer(routeline);
 	map.setView([32.045115, 118.778601], 13);
 }
-
+//互换按钮
 function reserve(){
 	var tmp = document.getElementById("start-input").value;
 	document.getElementById("start-input").value = document.getElementById("end-input").value;
@@ -185,6 +217,9 @@ function hideMarker(e){
 	}
 }
 
+/****routing路线*****************************************************************************/
+
+//画直线
 function drawLine(marker_1,marker_2){
 	if(map.hasLayer(polyline)){
 		map.removeLayer(polyline);		
@@ -202,84 +237,27 @@ function drawLine(marker_1,marker_2){
 	// map.fitBounds(polyline.getBounds());
 	map.addLayer(polyline);
 }
-
+//画导航线路
 function drawGeojson(json){
-	/*var route = {
-		"type": "FeatureCollection",
-		"features": [
-		{
-			"type": "Feature",
-			"geometry": {
-				"type": "LineString",
-				"coordinates": json
-			},
-			"properties": {
-				"popupContent": "This is free bus that will take you across downtown.",
-				"underConstruction": false
-			},
-			"id": 1
-		}
-		]
-	};
+	if(map.hasLayer(routeline)){
+		map.removeLayer(routeline);		
+	}
 
-	L.geoJson(route).addTo(map);*/
-
-	routeline = [{
+	var route = [{
 		"type": "LineString",
 		"coordinates": json
 	}];
 
-	var myStyle = {
-		"color": "#FF7F00",
-		"weight": 5,
-		/*"dashArray": "8,6",*/
-		"opacity": 0.65
-	};
+	routeline = L.geoJson(route,{style:{"color": "#FF7F00",	"weight": 5,"opacity": 0.65	}});
 
-	map.removeLayer(routeline);
-
-	L.geoJson(routeline, {
-		style: myStyle
-	}).addTo(map);
+	map.addLayer(routeline);
 
 }
 
-function clearURL(){
-	window.localStorage.clear();
-	alert("清空成功！");
-	window.location.reload();
-}
-
-function addURL(){
-	var name = document.getElementById("name-input").value.trim();
-	var url = document.getElementById("url-input").value.trim();
-	var urlInput = document.getElementById("url-input");
-
-	if(url==""){
-		// document.getElementById("url-input").style.outline = "#EE9A49 auto 5px";
-		addClass(urlInput, "empty-input");
-		return;
-	}else{
-		removeClass(urlInput, "empty-input");
-	}
-
-	if(name==""){
-		name = url.length <= 25? url: url.substring(0,25);
-	}
-
-	var storage = window.localStorage;
-	storage.setItem(url, name);
-	
-
-	alert(storage.getItem(url));
-
-	// document.getElementById("name-input").value = "";
-	// document.getElementById("url-input").value = "";
-	window.location.reload();
-}
-
-/****导航服务商onChange()*****/
+//导航服务商onChange()，重新导航
 function reRoute(){
+	if ((!map.hasLayer(startMarker))||(!map.hasLayer(endMarker))) return;
+
 	var selector = document.getElementById("route-seletor");
 	var text = selector.options[selector.selectedIndex].text;
 	var value = selector.options[selector.selectedIndex].value;
@@ -290,18 +268,17 @@ function reRoute(){
 		return;
 	}
 }
-
+//获取高德驾车最快线路导航json
 function getLbsJson(){
 	var json = [];
-
-	var startPoint = [startMarker.getLatLng().lng, startMarker.getLatLng().lat];
-	var endPoint = [endMarker.getLatLng().lng, endMarker.getLatLng().lat];
-	json.push(startPoint);
+	//地球坐标转成火星坐标
+	var startPoint = wgs84togcj02(startMarker.getLatLng().lng, startMarker.getLatLng().lat);
+	var endPoint = wgs84togcj02(endMarker.getLatLng().lng, endMarker.getLatLng().lat);
+	json.push([startMarker.getLatLng().lng, startMarker.getLatLng().lat]);
 
 	AMap.service(["AMap.Driving"], function() {
 		var driveOptions = { 
-			panel: 'display-info',
-			city: '南京市',                          
+			panel: 'display-info',                     
 			policy: AMap.DrivingPolicy.LEAST_TIME 
 		};
         //构造类
@@ -310,10 +287,10 @@ function getLbsJson(){
         drive.search(startPoint,endPoint , function(status, result){
         	for (var i = 0; i < result.routes[0].steps.length; i++) {
         		var endLoc = result.routes[0].steps[i].end_location;
-        		json.push([endLoc.lng,endLoc.lat]);
+
+        		json.push(gcj02towgs84(endLoc.lng, endLoc.lat)); //火星坐标转地球坐标
         	};        	
-        	alert("json length: "+json.length);
-		drawGeojson(json);
+        	drawGeojson(json);
         });
     });
 
@@ -323,22 +300,28 @@ function getLbsJson(){
 
 
 
+/****工具类*****************************************************************************/
+
+function formatLatLng(latlng){
+	return parseFloat(latlng.lat).toFixed(6) + ',' + parseFloat(latlng.lng).toFixed(4) ;
+}
+
 
 
 
 /****通用工具类*****************************************************************************/
 
 function hasClass(obj, cls) {  
-    return obj.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'));  
+	return obj.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'));  
 }  
-  
+
 function addClass(obj, cls) {  
-    if (!this.hasClass(obj, cls)) obj.className += " " + cls;  
+	if (!this.hasClass(obj, cls)) obj.className += " " + cls;  
 }  
-  
+
 function removeClass(obj, cls) {  
-    if (hasClass(obj, cls)) {  
-        var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)');  
-        obj.className = obj.className.replace(reg, '');  
-    }  
+	if (hasClass(obj, cls)) {  
+		var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)');  
+		obj.className = obj.className.replace(reg, '');  
+	}  
 }  
