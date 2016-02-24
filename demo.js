@@ -325,3 +325,28 @@ function removeClass(obj, cls) {
 		obj.className = obj.className.replace(reg, '');  
 	}  
 }  
+
+/****jquery****************************************************************************/
+
+$(document).ready(function(){
+	$("#left-cancel").click(function(){
+		$("#left-sidebar").animate({left:'-350px'},500,function(){$("#left-icon").show();});
+		
+	});
+
+	$("#left-icon").click(function(){
+		$("#left-icon").hide();
+		$("#left-sidebar").animate({left:'5px'},500);
+	});
+
+	$("#right-cancel").click(function(){
+		$("#right-sidebar").animate({right:'-400px'},500,function(){$("#right-icon").show();});
+		
+	});
+
+	$("#right-icon").click(function(){
+		$("#right-icon").hide();
+		$("#right-sidebar").animate({right:'5px'},500);
+	});
+});
+
