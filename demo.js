@@ -263,13 +263,29 @@ function reRoute(){
 	var value = selector.options[selector.selectedIndex].value;
 	// alert(selector.options[selector.selectedIndex].value);
 
-	if(value==1){
-		getLbsJson();
-		return;
+	switch(value){
+	case "lbs-driving":
+		getLbsDrivingJson();
+		break;
+	case 'lbs-walking':
+		getLbsWalkingJson();
+		break;
+	case "baidu":
+		break;
+	case 'hana':
+		break;
+	case 'osrm':
+		break;
+	default:
+		break;
+
 	}
+
+
 }
-//获取高德驾车最快线路导航json
-function getLbsJson(){
+
+//获取高德驾车线路json
+function getLbsDrivingJson(){
 	var json = [];
 	//地球坐标转成火星坐标
 	var startPoint = wgs84togcj02(startMarker.getLatLng().lng, startMarker.getLatLng().lat);
@@ -279,7 +295,7 @@ function getLbsJson(){
 	AMap.service(["AMap.Driving"], function() {
 		var driveOptions = { 
 			panel: 'display-info',                     
-			policy: AMap.DrivingPolicy.LEAST_TIME 
+			/*policy: AMap.DrivingPolicy.LEAST_TIME */
 		};
         //构造类
         var drive = new AMap.Driving(driveOptions);
@@ -293,11 +309,32 @@ function getLbsJson(){
         	drawGeojson(json);
         });
     });
-
-	
-	// return json;
 }
+//获取高德步行线路json
+function getLbsWalkingJson(){
+	var json = [];
+	//地球坐标转成火星坐标
+	var startPoint = wgs84togcj02(startMarker.getLatLng().lng, startMarker.getLatLng().lat);
+	var endPoint = wgs84togcj02(endMarker.getLatLng().lng, endMarker.getLatLng().lat);
+	json.push([startMarker.getLatLng().lng, startMarker.getLatLng().lat]);
 
+	AMap.service(["AMap.Walking"], function() {
+		var walkOptions = { 
+			panel: 'display-info'
+		};
+        //构造类
+        var walk = new AMap.Walking(walkOptions);
+        //根据起、终点坐标查询路线
+        walk.search(startPoint,endPoint , function(status, result){
+        	for (var i = 0; i < result.routes[0].steps.length; i++) {
+        		var endLoc = result.routes[0].steps[i].end_location;
+
+        		json.push(gcj02towgs84(endLoc.lng, endLoc.lat)); //火星坐标转地球坐标
+        	};        	
+        	drawGeojson(json);
+        });
+    });
+}
 
 
 /****工具类*****************************************************************************/
