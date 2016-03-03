@@ -193,7 +193,7 @@ function reset(){
 	map.removeLayer(endMarker);
 	map.removeLayer(polyline);
 	map.removeLayer(routeline);
-	$("#display-info").empty();
+	clearInfo();
 	map.setView(nj_coordinate, 13);
 }
 //互换按钮
@@ -364,17 +364,19 @@ function getBdDrivingJson(){
 
 	var queryString = toQueryString(query);
 	var url = "http://api.map.baidu.com/direction/v1?" + queryString;
-	console.log(url);
 
 	$.ajax({
 		url:url,
 		dataType:"jsonp"
 	}).done(function(data) {
 		var json = [];
+		var instruction = [];
 		var steps = data.result.routes[0].steps;
 		for (var i = 0; i < steps.length; i++) {
 			json = json.concat(stringToArray(steps[i].path));
+			instruction.push(steps[i].instructions);
 		};
+		displayInfo(instruction);
 		drawGeojson(json);
 	});
 
@@ -408,7 +410,18 @@ function stringToArray(str){
 	return res;
 }
 
+function displayInfo(infos){
+	var info = "<ol class='bd-info'>";
+	for (var i = 0; i < infos.length; i++) {
+		info = info + "<li>" + infos[i] + "</li>";
+	}
+	info += "</div>";
+	$("#display-info").html(info);
+}
 
+function clearInfo(){
+	$("#display-info").empty();
+}
 
 
 /****通用工具类*****************************************************************************/
