@@ -1,6 +1,8 @@
 /****初始化*****************************************************************************/
 
 var map,startMarker,endMarker,polyline,routeline;
+var nj_coordinate = [32.045115, 118.778601];
+var baidu_ak = "rnFk0NhFaSRv7b6rXH1dpNAN";
 
 //初始化地图
 function initMap(){
@@ -9,7 +11,7 @@ function initMap(){
 	var osm  = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: mbAttr});
 
 	map = L.map('map', {
-		center: [32.045115, 118.778601],
+		center: nj_coordinate,
 		zoom: 13,
 		/*minZoom: 11,*/
 		maxZoom: 17,
@@ -38,8 +40,8 @@ function initMap(){
 	var startIcon = new LeafIcon({iconUrl: 'images/marker-start.png'}),
 	endIcon = new LeafIcon({iconUrl: 'images/marker-end.png'});
 
-	startMarker = L.marker([32.045115, 118.778601], {icon: startIcon,draggable:true});
-	endMarker = L.marker([32.045115, 118.778601], {icon: endIcon,draggable:true});
+	startMarker = L.marker(nj_coordinate, {icon: startIcon,draggable:true});
+	endMarker = L.marker(nj_coordinate, {icon: endIcon,draggable:true});
 
 	startMarker.on('click', hideMarker);
 	startMarker.on('dragend',dragMarker);
@@ -191,7 +193,8 @@ function reset(){
 	map.removeLayer(endMarker);
 	map.removeLayer(polyline);
 	map.removeLayer(routeline);
-	map.setView([32.045115, 118.778601], 13);
+	$("#display-info").empty();
+	map.setView(nj_coordinate, 13);
 }
 //互换按钮
 function reserve(){
@@ -271,6 +274,7 @@ function reRoute(){
 		getLbsWalkingJson();
 		break;
 	case "baidu":
+		getBdDrivingJson();
 		break;
 	case 'hana':
 		break;
@@ -284,7 +288,7 @@ function reRoute(){
 
 }
 
-//获取高德驾车线路json
+//获取高德驾车线路json  lng,lat
 function getLbsDrivingJson(){
 	var json = [];
 	//地球坐标转成火星坐标
@@ -336,11 +340,72 @@ function getLbsWalkingJson(){
     });
 }
 
+//百度驾车路线json  lat,lng
+function getBdDrivingJson(){
+	var json = [];
+	var query = new Array();
+	query["mode"] = "driving";
+	query["origin_region"] = "南京";
+	query["destination_region"] = "南京";
+	query["output"] = "json";
+	query["ak"] = baidu_ak;
+	query["coord_type"] = "wgs84";
+	query["tactics"] = 12; //导航路线类型:10-不走高速；11-最少时间；12-最短路径(默认)
 
-/****工具类*****************************************************************************/
+	// var startPoint = wgs84tobd09(startMarker.getLatLng().lng, startMarker.getLatLng().lat);
+	// var endPoint = wgs84tobd09(endMarker.getLatLng().lng, endMarker.getLatLng().lat);
+
+	var startPoint = [startMarker.getLatLng().lng, startMarker.getLatLng().lat];
+	var endPoint = [endMarker.getLatLng().lng, endMarker.getLatLng().lat];
+
+	query["origin"] = startPoint[1] + "," + startPoint[0];
+	query["destination"] = endPoint[1] + "," + endPoint[0];
+	query.sort();
+
+	var queryString = toQueryString(query);
+	var url = "http://api.map.baidu.com/direction/v1?" + queryString;
+	console.log(url);
+
+	$.ajax({
+		url:url,
+		dataType:"jsonp"
+	}).done(function(data) {
+		var json = [];
+		var steps = data.result.routes[0].steps;
+		for (var i = 0; i < steps.length; i++) {
+			json = json.concat(stringToArray(steps[i].path));
+		};
+		drawGeojson(json);
+	});
+
+
+}
+
+
+/******工具类*****************************************************************************/
 
 function formatLatLng(latlng){
 	return parseFloat(latlng.lat).toFixed(6) + ',' + parseFloat(latlng.lng).toFixed(4) ;
+}
+
+function toQueryString(queryArray){
+	var res = "";
+	for(var key in queryArray){
+		var str = key + "=" + queryArray[key] + "&";
+		res += str;
+	}
+	res = res.substring(0,res.length-1);
+	return res;
+}
+
+function stringToArray(str){
+	var strArray = str.split(';');
+	var res = [];
+	for (var i = 0; i < strArray.length; i++) {
+		var tmp = strArray[i].split(",");
+		res.push(bd09towgs84(tmp[0],tmp[1]));
+	}
+	return res;
 }
 
 

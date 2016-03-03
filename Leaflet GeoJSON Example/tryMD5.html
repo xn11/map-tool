@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+
+	<script type="text/javascript" src="../jquery-1.12.1.min.js"></script>
+	<script type="text/javascript" src="../jquery.md5.js"></script>
+</head>
+<body>
+	<p></p>
+	<div></div>
+	<script type="text/javascript">
+		$(function(){
+			$("p").html(snCal());
+			// $("p").append(getJson());
+			// $("div").load("www.baidu.com");
+			$.ajax({
+				url:"http://api.map.baidu.com/direction/v1?mode=driving&origin=32.057554,118.7495&destination=32.049552,118.8041&origin_region=%E5%8D%97%E4%BA%AC&destination_region=%E5%8D%97%E4%BA%AC&output=json&ak=rnFk0NhFaSRv7b6rXH1dpNAN",
+				dataType:"jsonp"
+			}).done(function(data) {
+				alert(data);
+			});
+
+			
+		});
+
+		//计算sn，用户签名校验值
+		function snCal(){
+			var sk = "SvNFeIsAMifyXL7r90Zh7EBIXn5MbzKk";
+			var query = new Array();
+			query["mode"] = "driving";
+            query["origin"] = "32.057554,118.7495";
+			query["destination"] = "32.049552,118.8041";
+			query["origin_region"] = "南京";
+            query["destination_region"] = "南京";
+            query["outpush"] = "json";
+            query["ak"] = "Ks6D2DloK7TVnPoxV0xmk61r";
+
+// query["address"] = "百度大厦";
+// query["output"] = "json";
+// query["ak"] = "yourak";
+// var sk =  "yoursk";
+
+			query.sort();
+            var req = "/direction/v1?" + toQueryString(query) + sk;
+
+            // alert(req + "\n" + encodeURIComponent(req));
+            return $.md5(encodeURIComponent(req));
+		}
+
+		function toQueryString(query){
+			var res = "";
+			for(var key in query){
+				var str = encodeURIComponent(key) + "=" + encodeURIComponent(query[key]) + "&";
+				res += str;
+			}
+			res = res.substring(0,res.length-1);
+			return res;
+		}
+
+		// function toQueryString2(query){
+		// 	var res = "";
+		// 	for(var key in query){
+		// 		var str = key + "=" + query[key] + "&";
+		// 		res += str;
+		// 	}
+		// 	res = res.substring(0,res.length-1);
+		// 	return res;
+		// }
+
+		function getJson(){
+			$.getJSON("http://api.map.baidu.com/direction/v1?mode=driving&origin=32.057554,118.7495&destination=32.049552,118.8041&origin_region=%E5%8D%97%E4%BA%AC&destination_region=%E5%8D%97%E4%BA%AC&output=json&ak=rnFk0NhFaSRv7b6rXH1dpNAN",function(data){
+					return data.result.routes.steps.length;
+			});
+		}
+	</script>
+</body>
+</html>
+

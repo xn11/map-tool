@@ -10,6 +10,30 @@ var a = 6378245.0;
 var ee = 0.00669342162296594323;
 
 /**
+ * 百度坐标系 (BD-09) 与 WGS84 的转换
+ * 即 百度 转 GPS
+ * @param bd_lon
+ * @param bd_lat
+ * @returns {*[]}
+ */
+function bd09towgs84(bd_lon, bd_lat) {
+    var gcj = bd09togcj02(bd_lon, bd_lat);
+    return gcj02towgs84(gcj[0],gcj[1]);
+}
+
+/**
+ * WGS84 与 百度坐标系 (BD-09) 的转换
+ * 即 GPS 转 百度
+ * @param lng
+ * @param lat
+ * @returns {*[]}
+ */
+function wgs84tobd09(lng, lat) {
+    var gcj = wgs84togcj02(lng, lat);
+    return gcj02tobd09(gcj[0],gcj[1]);
+}
+
+/**
  * 百度坐标系 (BD-09) 与 火星坐标系 (GCJ-02)的转换
  * 即 百度 转 谷歌、高德
  * @param bd_lon
