@@ -389,6 +389,7 @@ function getHanaJson(){
 	var startPoint = [startMarker.getLatLng().lat, startMarker.getLatLng().lng];
 	var endPoint = [endMarker.getLatLng().lat, endMarker.getLatLng().lng];
 
+	var query = new Array();
 	query["startLat"] = startMarker.getLatLng().lat;
 	query["startLng"] = startMarker.getLatLng().lng;
 	query["endLat"] = endMarker.getLatLng().lat;
@@ -397,7 +398,7 @@ function getHanaJson(){
 	var queryString = toQueryString(query);	
 	const hostname = '127.0.0.1';
 	const port = 1337;
-	var url = "http://" + hostname + ":" + port + queryString;
+	var url = "http://" + hostname + ":" + port + "?" + queryString;
 
 	$.ajax({
 		url:url,
@@ -414,7 +415,11 @@ function getHanaJson(){
 		// };
 		// displayInfo(instruction);
 
-		json = data;
+		var res = data.res.split(',');
+		json.push([res[0],res[1]]);
+		json.push([res[2],res[3]]);
+
+		displayInfo(instruction);
 		drawGeojson(json);
 	});
 }
