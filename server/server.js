@@ -11,7 +11,6 @@ http.createServer((req, res) => {
   res.writeHead(200, {"Content-Type": "application/json"});
 
   var queryObj = url.parse(req.url,true).query;
-  console.log(addon.getJson(1,2));
 
   var json = JSON.stringify({ 
     res : addon.getJson(queryObj.startLng,queryObj.startLat,queryObj.endLng,queryObj.endLat),

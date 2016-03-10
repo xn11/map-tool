@@ -87,14 +87,13 @@ function clearURL(){
 function addURL(){
 	var name = document.getElementById("name-input").value.trim();
 	var url = document.getElementById("url-input").value.trim();
-	var urlInput = document.getElementById("url-input");
 
 	if(url==""||url.indexOf(".png")<0){
 		// document.getElementById("url-input").style.outline = "#EE9A49 auto 5px";
-		addClass(urlInput, "empty-input");
+		$("#url-input").addClass("empty-input");
 		return;
 	}else{
-		removeClass(urlInput, "empty-input");
+		$("#url-input").removeClass("empty-input");
 	}
 
 	if(name==""){
@@ -102,10 +101,9 @@ function addURL(){
 	}
 
 	var storage = window.localStorage;
-	storage.setItem(url, name);
-	
+	storage.setItem(url, name);	
 
-	alert(storage.getItem(url));
+	alert(storage.getItem(url) + "添加成功！");
 	window.location.reload();	//刷新页面
 }
 
@@ -295,6 +293,7 @@ function getLbsDrivingJson(){
 	//地球坐标转成火星坐标
 	var startPoint = wgs84togcj02(startMarker.getLatLng().lng, startMarker.getLatLng().lat);
 	var endPoint = wgs84togcj02(endMarker.getLatLng().lng, endMarker.getLatLng().lat);
+
 	json.push([startMarker.getLatLng().lng, startMarker.getLatLng().lat]);
 
 	AMap.service(["AMap.Driving"], function() {
@@ -311,6 +310,7 @@ function getLbsDrivingJson(){
 
         		json.push(gcj02towgs84(endLoc.lng, endLoc.lat)); //火星坐标转地球坐标
         	};        	
+			json.push([endMarker.getLatLng().lng, endMarker.getLatLng().lat]);
         	drawGeojson(json);
         });
     });
@@ -321,6 +321,7 @@ function getLbsWalkingJson(){
 	//地球坐标转成火星坐标
 	var startPoint = wgs84togcj02(startMarker.getLatLng().lng, startMarker.getLatLng().lat);
 	var endPoint = wgs84togcj02(endMarker.getLatLng().lng, endMarker.getLatLng().lat);
+
 	json.push([startMarker.getLatLng().lng, startMarker.getLatLng().lat]);
 
 	AMap.service(["AMap.Walking"], function() {
@@ -336,6 +337,7 @@ function getLbsWalkingJson(){
 
         		json.push(gcj02towgs84(endLoc.lng, endLoc.lat)); //火星坐标转地球坐标
         	};        	
+        	json.push([endMarker.getLatLng().lng, endMarker.getLatLng().lat]);
         	drawGeojson(json);
         });
     });
@@ -373,10 +375,12 @@ function getBdDrivingJson(){
 		var json = [];
 		var instruction = [];
 		var steps = data.result.routes[0].steps;
+		json.push(startPoint);
 		for (var i = 0; i < steps.length; i++) {
 			json = json.concat(stringToArray(steps[i].path));
 			instruction.push(steps[i].instructions);
 		};
+		json.push(endPoint);
 		displayInfo(instruction);
 		drawGeojson(json);
 	});
@@ -471,16 +475,16 @@ function hasClass(obj, cls) {
 	return obj.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'));  
 }  
 
-function addClass(obj, cls) {  
-	if (!this.hasClass(obj, cls)) obj.className += " " + cls;  
-}  
+// function addClass(obj, cls) {  
+// 	if (!this.hasClass(obj, cls)) obj.className += " " + cls;  
+// }  
 
-function removeClass(obj, cls) {  
-	if (hasClass(obj, cls)) {  
-		var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)');  
-		obj.className = obj.className.replace(reg, '');  
-	}  
-}  
+// function removeClass(obj, cls) {  
+// 	if (hasClass(obj, cls)) {  
+// 		var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)');  
+// 		obj.className = obj.className.replace(reg, '');  
+// 	}  
+// }  
 
 /****jquery****************************************************************************/
 
