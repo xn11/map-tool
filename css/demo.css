@@ -12,7 +12,7 @@ html, body
 {
 	height: 100%;
 	z-index: 0;
-	background: #00FF00 url('images/n.png') repeat;
+	background: #00FF00 url('../images/n.png') repeat;
 }
 
 /* 左边栏 */
@@ -144,13 +144,13 @@ html, body
 	vertical-align: top;
 }
 .cancel-icon{
-	background: url("images/cancel.png") no-repeat center;
+	background: url("../images/cancel.png") no-repeat center;
 }
 .show-icon{
-	background: url("images/show.png") no-repeat center;
+	background: url("../images/show.png") no-repeat center;
 }
 .config-icon{
-	background: url("images/config.png") no-repeat center;
+	background: url("../images/config.png") no-repeat center;
 }
 
 

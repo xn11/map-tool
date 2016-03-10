@@ -277,6 +277,7 @@ function reRoute(){
 		getBdDrivingJson();
 		break;
 	case 'hana':
+		getHanaJson();
 		break;
 	case 'osrm':
 		break;
@@ -381,6 +382,41 @@ function getBdDrivingJson(){
 	});
 
 
+}
+
+//Hana调C++方法  lat,lng
+function getHanaJson(){
+	var startPoint = [startMarker.getLatLng().lat, startMarker.getLatLng().lng];
+	var endPoint = [endMarker.getLatLng().lat, endMarker.getLatLng().lng];
+
+	query["startLat"] = startMarker.getLatLng().lat;
+	query["startLng"] = startMarker.getLatLng().lng;
+	query["endLat"] = endMarker.getLatLng().lat;
+	query["endLng"] = endMarker.getLatLng().lng;
+
+	var queryString = toQueryString(query);	
+	const hostname = '127.0.0.1';
+	const port = 1337;
+	var url = "http://" + hostname + ":" + port + queryString;
+
+	$.ajax({
+		url:url,
+		dataType:"jsonp",
+		jsonp:"callback",
+		jsonpCallback:"success_jsonpCallback"
+	}).done(function(data) {
+		var json = [];
+		var instruction = [];
+		// var steps = data.result.routes[0].steps;
+		// for (var i = 0; i < steps.length; i++) {
+		// 	json = json.concat(stringToArray(steps[i].path));
+		// 	instruction.push(steps[i].instructions);
+		// };
+		// displayInfo(instruction);
+
+		json = data;
+		drawGeojson(json);
+	});
 }
 
 
