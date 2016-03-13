@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>demo</title>
+	<title>map tool v1.0</title>
 	<meta charset="utf-8" />
 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,20 +9,15 @@
 	<link rel="stylesheet" href="leaflet/leaflet.css" />
 	<link rel="stylesheet" href="css/demo.css" />
 
-	<script src="js/jquery-1.12.1.min.js"></script>
+	<script src="js/jquery-1.12.1.min.js"></script>	
 	<script src="js/coordinateTrans.js"></script>
-	<!-- <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js" type="text/javascript"></script> -->
-	<script src="http://webapi.amap.com/maps?v=1.3&key=2ad58dd1832ce97111bf2f62921a968c"></script>	
+	<script src="leaflet/leaflet.js"></script>
+	<script src="js/util.js"></script>
+	<script src="js/routing.js"></script>
 	<script src="js/demo.js"></script>
 </head>
 <body>
 	<div id="map"></div>
-
-	<script src="leaflet/leaflet.js"></script>
-	<script>
-		initMap();	
-	</script>
-
 
 	<div id="left-icon">
 		<div class="panel">
@@ -46,12 +41,12 @@
 				<div class="input-area">
 					<label for="start-input">起点： </label>
 					<input id="start-input" name="start-input" class="input-text" type="text" placeholder="请输入起点" />
-					<a class="button right-button" onclick="showMarker(0)">显示</a>
+					<a class="button right-button" id="show_start_marker">显示</a>
 				</div>
 				<div class="input-area">
 					<label for="end-input">终点： </label>
 					<input id="end-input" name="end-input" class="input-text" type="text" placeholder="请输入终点" />
-					<a class="button right-button" onclick="showMarker(1)">显示</a>
+					<a class="button right-button" id="show_end_marker">显示</a>
 				</div>
 				<div class="button-area">
 					<!-- <a class="button left-button grey-button" id="reset-button" onclick="reset()">重置</a> -->
@@ -62,8 +57,8 @@
 						<option value="hana">HANA导航</option>
 						<option value="osrm">OSRM导航</option>
 					</select>
-					<a class="button right-button" id="reverse-button" onclick="reserve()">互换</a>
-					<a class="button right-button grey-button" id="reset-button" onclick="reset()">重置</a>
+					<a class="button right-button" id="reverse-button">互换</a>
+					<a class="button right-button grey-button" id="reset-button">重置</a>
 				</div>
 			</div>
 		</div>
@@ -82,7 +77,6 @@
 				<div class="panel-title">自定义底图</div>
 			</div>
 			<div class="panel-body">
-				<!-- <form id="add-url-form" method="get" action="addURL()"> -->
 				<div class="input-area">
 					<label for="name-input">名称： </label>
 					<input id="name-input" name="name-input" class="input-text" type="text" placeholder="请输入底图名称" />
@@ -94,9 +88,7 @@
 				<div class="button-area">
 					<a class="button right-button" id="add-url-button" onclick="addURL()">添加底图</a>					
 					<a class="button right-button grey-button" id="clear-url-button" onclick="clearURL()">清空底图</a>
-					<!-- <input type="submit" class="button right-button" > -->
 				</div>
-				<!-- </form> -->
 			</div>
 		</div>
 	</div>

@@ -2,8 +2,72 @@
 
 var map,startMarker,endMarker,polyline,routeline;
 var nj_coordinate = [32.045115, 118.778601];
-var baidu_ak = "rnFk0NhFaSRv7b6rXH1dpNAN";
 
+
+/****初始化****************************************************************************/
+
+$(document).ready(function(){
+	initMap();
+
+	//按钮click事件
+	$("#show_start_marker").click(function(){
+		showMarker(0);
+	});
+
+	$("#show_end_marker").click(function(){
+		showMarker(1);
+	});
+
+	$("#reverse-button").click(function(){
+		reserve();
+	});
+
+	$("#reset-button").click(function(){
+		resetMarker();
+	});
+
+	//回车事件
+	$("#start-input").bind("keypress",function(e){
+		if(e.keyCode == "13"){
+			$("#show_start_marker").click();
+		}
+	});
+
+	$("#end-input").bind("keypress",function(e){
+		if(e.keyCode == "13"){
+			$("#show_end_marker").click();
+		}
+	});
+
+	$("#url-input").bind("keypress",function(e){
+		if(e.keyCode == "13"){
+			$("#add-url-button").click();
+		}
+	});
+
+	//cancel和还原
+	$("#left-cancel").click(function(){
+		$("#left-sidebar").animate({left:'-350px'},500,function(){$("#left-icon").show();});		
+	});
+
+	$("#left-icon").click(function(){
+		$("#left-icon").hide();
+		$("#left-sidebar").animate({left:'5px'},500);
+	});
+
+	$("#right-cancel").click(function(){
+		$("#right-sidebar").animate({right:'-400px'},500,function(){$("#right-icon").show();});
+		
+	});
+
+	$("#right-icon").click(function(){
+		$("#right-icon").hide();
+		$("#right-sidebar").animate({right:'5px'},500);
+	});
+});
+
+
+/*******************************************************************************************************/
 //初始化地图
 function initMap(){
 	var mbAttr = '&copy; SAP NIC';
@@ -77,7 +141,6 @@ function getURL(){
 	return baseLayers;
 }
 
-
 function clearURL(){
 	window.localStorage.clear();
 	alert("清空成功！");
@@ -89,7 +152,6 @@ function addURL(){
 	var url = document.getElementById("url-input").value.trim();
 
 	if(url==""||url.indexOf(".png")<0){
-		// document.getElementById("url-input").style.outline = "#EE9A49 auto 5px";
 		$("#url-input").addClass("empty-input");
 		return;
 	}else{
@@ -136,19 +198,12 @@ function handleMarker(marker_id, str){
 			setMarker(marker_id, second, first);  //经纬度交换位置
 		}
 
-		// OSRM.Geocoder.updateAddress( marker_id );
 		return;
 	}
 }
 
 function onMapClick(e) {
-	/*var popup = L.popup();
-	popup
-	.setLatLng(e.latlng)
-	.setContent("You clicked the map at " + e.latlng.toString())
-	.openOn(map);*/
 
-	// L.marker(e.latlng,{draggable:true,}).addTo(map);
 	var value = formatLatLng(e.latlng);
 	if(!map.hasLayer(startMarker)){
 		startMarker.setLatLng(e.latlng);
@@ -170,8 +225,7 @@ function onMapClick(e) {
 function setMarker(marker_id, lat, lng){
 	var marker = marker_id == 0? startMarker: endMarker;
 	marker.setLatLng([lat,lng]);
-	// marker.setOpacity(1);
-	// marker.addTo(map);
+
 	map.addLayer(marker);
 	map.setView([lat,lng], 13);
 	drawLine(startMarker,endMarker);
@@ -184,7 +238,7 @@ function showMarker(marker_id){
 	handleMarker(marker_id,str);
 }
 //重置按钮
-function reset(){
+function resetMarker(){
 	document.getElementById("start-input").value = "";
 	document.getElementById("end-input").value = "";
 	map.removeLayer(startMarker);
@@ -206,9 +260,6 @@ function reserve(){
 }
 
 function hideMarker(e){
-	// e.target._removeIcon();
-	// e.target._removeShadow();
-	// e.target.setOpacity(0);
 	if(e.target.options.icon.options.iconUrl.indexOf('start')>=0){
 		map.removeLayer(startMarker);
 		document.getElementById("start-input").value = "";
@@ -234,10 +285,9 @@ function drawLine(marker_1,marker_2){
 
 	polyline = L.polyline(latlngs, {color:'#FF7F00', weight:2, dashArray:"8,6"});
 
-	// zoom the map to the polyline
-	// map.fitBounds(polyline.getBounds());
 	map.addLayer(polyline);
 }
+
 //画导航线路
 function drawGeojson(json){
 	if(map.hasLayer(routeline)){
@@ -252,7 +302,6 @@ function drawGeojson(json){
 	routeline = L.geoJson(route,{style:{"color": "#FF7F00",	"weight": 5,"opacity": 0.65	}});
 
 	map.addLayer(routeline);
-
 }
 
 //导航服务商onChange()，重新导航
@@ -262,20 +311,19 @@ function reRoute(){
 	var selector = document.getElementById("route-seletor");
 	var text = selector.options[selector.selectedIndex].text;
 	var value = selector.options[selector.selectedIndex].value;
-	// alert(selector.options[selector.selectedIndex].value);
 
 	switch(value){
 	case "lbs-driving":
-		getLbsDrivingJson();
+		getLbsJson("Driving", startMarker, endMarker);
 		break;
 	case 'lbs-walking':
-		getLbsWalkingJson();
+		getLbsJson("Walking", startMarker, endMarker);
 		break;
 	case "baidu":
-		getBdDrivingJson();
+		getBdDrivingJson(startMarker,endMarker);
 		break;
 	case 'hana':
-		getHanaJson();
+		getHanaJson(startMarker,endMarker);
 		break;
 	case 'osrm':
 		break;
@@ -283,230 +331,5 @@ function reRoute(){
 		break;
 
 	}
-
-
 }
-
-//获取高德驾车线路json  lng,lat
-function getLbsDrivingJson(){
-	var json = [];
-	//地球坐标转成火星坐标
-	var startPoint = wgs84togcj02(startMarker.getLatLng().lng, startMarker.getLatLng().lat);
-	var endPoint = wgs84togcj02(endMarker.getLatLng().lng, endMarker.getLatLng().lat);
-
-	json.push([startMarker.getLatLng().lng, startMarker.getLatLng().lat]);
-
-	AMap.service(["AMap.Driving"], function() {
-		var driveOptions = { 
-			panel: 'display-info',                     
-			/*policy: AMap.DrivingPolicy.LEAST_TIME */
-		};
-        //构造类
-        var drive = new AMap.Driving(driveOptions);
-        //根据起、终点坐标查询路线
-        drive.search(startPoint,endPoint , function(status, result){
-        	for (var i = 0; i < result.routes[0].steps.length; i++) {
-        		var endLoc = result.routes[0].steps[i].end_location;
-
-        		json.push(gcj02towgs84(endLoc.lng, endLoc.lat)); //火星坐标转地球坐标
-        	};        	
-			json.push([endMarker.getLatLng().lng, endMarker.getLatLng().lat]);
-        	drawGeojson(json);
-        });
-    });
-}
-//获取高德步行线路json
-function getLbsWalkingJson(){
-	var json = [];
-	//地球坐标转成火星坐标
-	var startPoint = wgs84togcj02(startMarker.getLatLng().lng, startMarker.getLatLng().lat);
-	var endPoint = wgs84togcj02(endMarker.getLatLng().lng, endMarker.getLatLng().lat);
-
-	json.push([startMarker.getLatLng().lng, startMarker.getLatLng().lat]);
-
-	AMap.service(["AMap.Walking"], function() {
-		var walkOptions = { 
-			panel: 'display-info'
-		};
-        //构造类
-        var walk = new AMap.Walking(walkOptions);
-        //根据起、终点坐标查询路线
-        walk.search(startPoint,endPoint , function(status, result){
-        	for (var i = 0; i < result.routes[0].steps.length; i++) {
-        		var endLoc = result.routes[0].steps[i].end_location;
-
-        		json.push(gcj02towgs84(endLoc.lng, endLoc.lat)); //火星坐标转地球坐标
-        	};        	
-        	json.push([endMarker.getLatLng().lng, endMarker.getLatLng().lat]);
-        	drawGeojson(json);
-        });
-    });
-}
-
-//百度驾车路线json  lat,lng
-function getBdDrivingJson(){
-	var json = [];
-	var query = new Array();
-	query["mode"] = "driving";
-	query["origin_region"] = "南京";
-	query["destination_region"] = "南京";
-	query["output"] = "json";
-	query["ak"] = baidu_ak;
-	query["coord_type"] = "wgs84";
-	query["tactics"] = 12; //导航路线类型:10-不走高速；11-最少时间；12-最短路径(默认)
-
-	// var startPoint = wgs84tobd09(startMarker.getLatLng().lng, startMarker.getLatLng().lat);
-	// var endPoint = wgs84tobd09(endMarker.getLatLng().lng, endMarker.getLatLng().lat);
-
-	var startPoint = [startMarker.getLatLng().lng, startMarker.getLatLng().lat];
-	var endPoint = [endMarker.getLatLng().lng, endMarker.getLatLng().lat];
-
-	query["origin"] = startPoint[1] + "," + startPoint[0];
-	query["destination"] = endPoint[1] + "," + endPoint[0];
-	query.sort();
-
-	var queryString = toQueryString(query);
-	var url = "http://api.map.baidu.com/direction/v1?" + queryString;
-
-	$.ajax({
-		url:url,
-		dataType:"jsonp"
-	}).done(function(data) {
-		var json = [];
-		var instruction = [];
-		var steps = data.result.routes[0].steps;
-		json.push(startPoint);
-		for (var i = 0; i < steps.length; i++) {
-			json = json.concat(stringToArray(steps[i].path));
-			instruction.push(steps[i].instructions);
-		};
-		json.push(endPoint);
-		displayInfo(instruction);
-		drawGeojson(json);
-	});
-
-
-}
-
-//Hana调C++方法  lat,lng
-function getHanaJson(){
-	var startPoint = [startMarker.getLatLng().lat, startMarker.getLatLng().lng];
-	var endPoint = [endMarker.getLatLng().lat, endMarker.getLatLng().lng];
-
-	var query = new Array();
-	query["startLat"] = startMarker.getLatLng().lat;
-	query["startLng"] = startMarker.getLatLng().lng;
-	query["endLat"] = endMarker.getLatLng().lat;
-	query["endLng"] = endMarker.getLatLng().lng;
-
-	var queryString = toQueryString(query);	
-	const hostname = '127.0.0.1';
-	const port = 1337;
-	var url = "http://" + hostname + ":" + port + "?" + queryString;
-
-	$.ajax({
-		url:url,
-		dataType:"jsonp",
-		jsonp:"callback",
-		jsonpCallback:"success_jsonpCallback"
-	}).done(function(data) {
-		var json = [];
-		var instruction = [];
-		// var steps = data.result.routes[0].steps;
-		// for (var i = 0; i < steps.length; i++) {
-		// 	json = json.concat(stringToArray(steps[i].path));
-		// 	instruction.push(steps[i].instructions);
-		// };
-		// displayInfo(instruction);
-
-		var res = data.res.split(',');
-		json.push([res[0],res[1]]);
-		json.push([res[2],res[3]]);
-
-		displayInfo(instruction);
-		drawGeojson(json);
-	});
-}
-
-
-/******工具类*****************************************************************************/
-
-function formatLatLng(latlng){
-	return parseFloat(latlng.lat).toFixed(6) + ',' + parseFloat(latlng.lng).toFixed(4) ;
-}
-
-function toQueryString(queryArray){
-	var res = "";
-	for(var key in queryArray){
-		var str = key + "=" + queryArray[key] + "&";
-		res += str;
-	}
-	res = res.substring(0,res.length-1);
-	return res;
-}
-
-function stringToArray(str){
-	var strArray = str.split(';');
-	var res = [];
-	for (var i = 0; i < strArray.length; i++) {
-		var tmp = strArray[i].split(",");
-		res.push(bd09towgs84(tmp[0],tmp[1]));
-	}
-	return res;
-}
-
-function displayInfo(infos){
-	var info = "<ol class='bd-info'>";
-	for (var i = 0; i < infos.length; i++) {
-		info = info + "<li>" + infos[i] + "</li>";
-	}
-	info += "</div>";
-	$("#display-info").html(info);
-}
-
-function clearInfo(){
-	$("#display-info").empty();
-}
-
-
-/****通用工具类*****************************************************************************/
-
-function hasClass(obj, cls) {  
-	return obj.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'));  
-}  
-
-// function addClass(obj, cls) {  
-// 	if (!this.hasClass(obj, cls)) obj.className += " " + cls;  
-// }  
-
-// function removeClass(obj, cls) {  
-// 	if (hasClass(obj, cls)) {  
-// 		var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)');  
-// 		obj.className = obj.className.replace(reg, '');  
-// 	}  
-// }  
-
-/****jquery****************************************************************************/
-
-$(document).ready(function(){
-	$("#left-cancel").click(function(){
-		$("#left-sidebar").animate({left:'-350px'},500,function(){$("#left-icon").show();});
-		
-	});
-
-	$("#left-icon").click(function(){
-		$("#left-icon").hide();
-		$("#left-sidebar").animate({left:'5px'},500);
-	});
-
-	$("#right-cancel").click(function(){
-		$("#right-sidebar").animate({right:'-400px'},500,function(){$("#right-icon").show();});
-		
-	});
-
-	$("#right-icon").click(function(){
-		$("#right-icon").hide();
-		$("#right-sidebar").animate({right:'5px'},500);
-	});
-});
 
