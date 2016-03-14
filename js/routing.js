@@ -33,10 +33,16 @@ function getLbsJson(type,startMarker,endMarker){
 
         //根据起、终点坐标查询路线
         lbs_class.search(startPoint, endPoint, function(status, result){
-        	for (var i = 0; i < result.routes[0].steps.length; i++) {
-        		var endLoc = result.routes[0].steps[i].end_location;
+        	var steps = result.routes[0].steps;
 
-        		json.push(gcj02towgs84(endLoc.lng, endLoc.lat)); 	//火星坐标转地球坐标
+        	for (var i = 0; i < steps.length; i++) {
+
+        		var path = steps[i].path;
+        		for (var j = 0; j < path.length; j++) {
+        			json.push(gcj02towgs84(path[j].lng,path[j].lat));	//火星坐标转地球坐标
+        		};
+
+        		// json.push(gcj02towgs84(endLoc.lng, endLoc.lat)); 	//火星坐标转地球坐标
         	};        	
 
         	json.push([endMarker.getLatLng().lng, endMarker.getLatLng().lat]);
@@ -46,34 +52,6 @@ function getLbsJson(type,startMarker,endMarker){
 	})
 	
 }
-
-//获取高德步行线路json
-/*function getLbsWalkingJson(){
-	var json = [];
-	//地球坐标转成火星坐标
-	var startPoint = wgs84togcj02(startMarker.getLatLng().lng, startMarker.getLatLng().lat);
-	var endPoint = wgs84togcj02(endMarker.getLatLng().lng, endMarker.getLatLng().lat);
-
-	json.push([startMarker.getLatLng().lng, startMarker.getLatLng().lat]);
-
-	AMap.service(["AMap.Walking"], function() {
-		var walkOptions = { 
-			panel: 'display-info'
-		};
-        //构造类
-        var walk = new AMap.Walking(walkOptions);
-        //根据起、终点坐标查询路线
-        walk.search(startPoint,endPoint , function(status, result){
-        	for (var i = 0; i < result.routes[0].steps.length; i++) {
-        		var endLoc = result.routes[0].steps[i].end_location;
-
-        		json.push(gcj02towgs84(endLoc.lng, endLoc.lat)); //火星坐标转地球坐标
-        	};        	
-        	json.push([endMarker.getLatLng().lng, endMarker.getLatLng().lat]);
-        	drawGeojson(json);
-        });
-    });
-}*/
 
 //百度驾车路线json  lat,lng
 function getBdDrivingJson(startMarker,endMarker){
