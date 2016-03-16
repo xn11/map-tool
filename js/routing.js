@@ -4,15 +4,15 @@ var baidu_ak = "rnFk0NhFaSRv7b6rXH1dpNAN";
 // var Lbs_key = "2ad58dd1832ce97111bf2f62921a968c";
 var webServices = CONFIG.webServices;
 
-function getRouteJson(routeIndex, startMarker, endMarker){
+function getRouteJson(routeIndex, startMarker, endMarker, viaMarkers){
 	var route = CONFIG.routings[routeIndex];
 
 	switch(route.provider){
 	case "lbs":
-		getLbsJson(route.routeType, startMarker, endMarker);
+		getLbsJson(route.routeType, startMarker, endMarker,viaMarkers);
 		break;
 	case "baidu":
-		getBdJson(route.routeType, route.routeOptions, startMarker, endMarker);
+		getBdJson(route.routeType, route.routeOptions, startMarker, endMarker,viaMarkers);
 		break;
 	case 'hana':
 		getHanaJson(startMarker,endMarker);
@@ -27,11 +27,17 @@ function getRouteJson(routeIndex, startMarker, endMarker){
 
 
 //获取高德驾车/步行线路json  lng,lat
-function getLbsJson(type,startMarker,endMarker){
+function getLbsJson(type,startMarker,endMarker,viaMarkers){
 	var json = [];
 	//地球坐标转成火星坐标
 	var startPoint = wgs84togcj02(startMarker.getLatLng().lng, startMarker.getLatLng().lat);
 	var endPoint = wgs84togcj02(endMarker.getLatLng().lng, endMarker.getLatLng().lat);
+
+	//途经点
+	var waypoints = new Array();
+	for (var i = 0; i < viaMarkers.length; i++) {
+		waypoints.push(wgs84togcj02(viaMarkers[i].getLatLng().lng,viaMarkers[i].getLatLng().lat));
+	};
 
 	json.push([startMarker.getLatLng().lng, startMarker.getLatLng().lat]);
 
@@ -54,7 +60,8 @@ function getLbsJson(type,startMarker,endMarker){
 		}
 
         //根据起、终点坐标查询路线
-        lbs_class.search(startPoint, endPoint, function(status, result){
+        lbs_class.search(startPoint, endPoint, {"waypoints":waypoints}, function(status, result){
+        // lbs_class.search(waypoints, function(status, result){
         	var steps = result.routes[0].steps;
 
         	for (var i = 0; i < steps.length; i++) {
@@ -76,7 +83,7 @@ function getLbsJson(type,startMarker,endMarker){
 }
 
 //百度导航路线json  lat,lng
-function getBdJson(type,options,startMarker,endMarker){
+function getBdJson(type,options,startMarker,endMarker,viaMarkers){
 	var json = [];
 	// var query = new Array();
 	// query["mode"] = type;
@@ -98,6 +105,17 @@ function getBdJson(type,options,startMarker,endMarker){
 
 	options["origin"] = startPoint[1] + "," + startPoint[0];
 	options["destination"] = endPoint[1] + "," + endPoint[0];
+
+	//途经点
+	var waypoints = "";
+	if(viaMarkers.length > 0){
+		for (var i = 0; i < viaMarkers.length; i++) {
+			waypoints = waypoints + viaMarkers[i].getLatLng().lat + "," + viaMarkers[i].getLatLng().lng + "|";
+		};
+		waypoints = waypoints.substring(0,waypoints.length-1);
+		options["waypoints"] = waypoints;
+	}
+	
 	// options.sort();
 
 	var queryString = toQueryString(options);

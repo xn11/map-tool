@@ -26,7 +26,7 @@ var CONFIG = {
 			},
 			"lbs": {
 				"url": "http://webapi.amap.com/maps?v=1.3&key=2ad58dd1832ce97111bf2f62921a968c",
-				"key": "2ad58dd1832ce97111bf2f62921a968c",
+				// "key": "2ad58dd1832ce97111bf2f62921a968c",
 				"routeType": ["Driving","Walking"]
 			},
 			"hana": {
