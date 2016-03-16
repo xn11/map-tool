@@ -127,11 +127,15 @@ function getBdJson(type,options,startMarker,endMarker,viaMarkers){
 	}).done(function(data) {
 		var json = [];
 		var instruction = [];
-		var steps = data.result.routes[0].steps;
 		json.push(startPoint);
-		for (var i = 0; i < steps.length; i++) {
-			json = json.concat(stringToArray(steps[i].path));
-			instruction.push(steps[i].instructions);
+
+		for (var i = 0; i < data.result.routes.length; i++) {		//百度返回码中的routes数组是多段路径的集合，需要遍历拼接！！
+			var steps = data.result.routes[i].steps;
+
+			for (var j = 0; j < steps.length; j++) {
+				json = json.concat(stringToArray(steps[j].path));
+				instruction.push(steps[j].instructions);
+			};
 		};
 		json.push(endPoint);
 		displayInfo(instruction);
