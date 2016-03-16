@@ -1,4 +1,4 @@
-var config = {
+var CONFIG = {
 
 	//底图列表，默认显示第一个
 	"baseMaps":[
@@ -22,12 +22,12 @@ var config = {
 			"baidu": {
 				"url": "http://api.map.baidu.com/direction/v1?",		//请求服务的url
 				"key": "rnFk0NhFaSRv7b6rXH1dpNAN",
-				"type": ["driving"]
+				"routeType": ["driving"]
 			},
 			"lbs": {
 				"url": "http://webapi.amap.com/maps?v=1.3&key=2ad58dd1832ce97111bf2f62921a968c",
 				"key": "2ad58dd1832ce97111bf2f62921a968c",
-				"type": ["Driving","Walking"]
+				"routeType": ["Driving","Walking"]
 			},
 			"hana": {
 				"hostname": "127.0.0.1",
@@ -46,20 +46,20 @@ var config = {
 			"name": "高德驾车导航",
 			"id": "lbs-driving",
 			"provider": "lbs",
-			"type": 0
+			"routeType": "Driving"
 		},
 		{
 			"name": "高德步行导航",
 			"id": "lbs-walking",
 			"provider": "lbs",
-			"type": 1
+			"routeType": "Walking"
 		},
 		{
 			"name": "百度导航",
 			"id": "baidu",
 			"provider": "baidu",
-			"type": 0,
-			"options": {
+			"routeType": "driving",
+			"routeOptions": {
 				"origin_region": "南京",
 				"destination_region": "南京",
 				"tactics": 12,			//导航路线类型:10-不走高速；11-最少时间；12-最短路径(默认)

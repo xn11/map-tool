@@ -53,11 +53,11 @@ function getLbsJson(type,startMarker,endMarker){
 	
 }
 
-//百度驾车路线json  lat,lng
-function getBdDrivingJson(startMarker,endMarker){
+//百度导航路线json  lat,lng
+function getBdJson(type,options,startMarker,endMarker){
 	var json = [];
 	var query = new Array();
-	query["mode"] = "driving";
+	query["mode"] = type;
 	query["origin_region"] = "南京";
 	query["destination_region"] = "南京";
 	query["output"] = "json";

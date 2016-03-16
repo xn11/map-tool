@@ -9,6 +9,8 @@ var nj_coordinate = [32.045115, 118.778601];
 $(document).ready(function(){
 	initMap();
 
+	initSelector();
+
 	//按钮click事件
 	$("#show_start_marker").click(function(){
 		showMarker(0);
@@ -112,6 +114,19 @@ function initMap(){
 	endMarker.on('click', hideMarker);
 	endMarker.on('dragend',dragMarker);
 }
+
+//初始化导航selector
+function initSelector(){
+	// <option value="lbs-driving">高德驾车导航</option>
+
+	var routings = CONFIG.routings;
+	for (var i = 0; i < routings.length; i++) {
+		var option = '<option value="' + i + '">' + routings[i].name + '</option>'
+		$("#route-seletor").append(option);
+	}
+	
+}
+
 
 //从localstorage中获取自定义底图URL
 function getURL(){
@@ -309,18 +324,16 @@ function reRoute(){
 	if ((!map.hasLayer(startMarker))||(!map.hasLayer(endMarker))) return;
 
 	var selector = document.getElementById("route-seletor");
-	var text = selector.options[selector.selectedIndex].text;
+	// var text = selector.options[selector.selectedIndex].text;
 	var value = selector.options[selector.selectedIndex].value;
+	var route = CONFIG.routings[value];
 
-	switch(value){
-	case "lbs-driving":
-		getLbsJson("Driving", startMarker, endMarker);
-		break;
-	case 'lbs-walking':
-		getLbsJson("Walking", startMarker, endMarker);
+	switch(route.provider){
+	case "lbs":
+		getLbsJson(route.routeType, startMarker, endMarker);
 		break;
 	case "baidu":
-		getBdDrivingJson(startMarker,endMarker);
+		getBdJson(route.routeType, route.routeOptions, startMarker, endMarker);
 		break;
 	case 'hana':
 		getHanaJson(startMarker,endMarker);
