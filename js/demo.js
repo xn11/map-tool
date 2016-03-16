@@ -70,22 +70,23 @@ $(document).ready(function(){
 
 
 /*******************************************************************************************************/
-//初始化地图
+//初始化地图 ==>调用basemap.js文件
 function initMap(){
 	var mbAttr = '&copy; SAP NIC';
 
-	var osm  = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: mbAttr});
+	var defaultLayerUrl  = CONFIG.baseMaps[0].url; 
+	var osm  = L.tileLayer(defaultLayerUrl, {attribution: mbAttr});
 
 	map = L.map('map', {
 		center: nj_coordinate,
-		zoom: 13,
+		zoom: CONFIG.zoom,
 		/*minZoom: 11,*/
-		maxZoom: 17,
+		/*maxZoom: 17,*/
 		doubleClickZoom: false,
 		layers: [osm]
 	});
 
-	var baseLayers = getURL();
+	var baseLayers = getURL();	//调用basemap.js文件
 
 	L.control.layers(baseLayers).addTo(map);
 
@@ -117,18 +118,15 @@ function initMap(){
 
 //初始化导航selector
 function initSelector(){
-	// <option value="lbs-driving">高德驾车导航</option>
-
 	var routings = CONFIG.routings;
 	for (var i = 0; i < routings.length; i++) {
 		var option = '<option value="' + i + '">' + routings[i].name + '</option>'
 		$("#route-seletor").append(option);
-	}
-	
+	}	
 }
 
 
-//从localstorage中获取自定义底图URL
+/*//从localstorage中获取自定义底图URL
 function getURL(){
 	var mbAttr = '&copy; SAP NIC';
 
@@ -182,7 +180,7 @@ function addURL(){
 
 	alert(storage.getItem(url) + "添加成功！");
 	window.location.reload();	//刷新页面
-}
+}*/
 
 /****marker操作*****************************************************************************/
 
@@ -319,30 +317,16 @@ function drawGeojson(json){
 	map.addLayer(routeline);
 }
 
-//导航服务商onChange()，重新导航
+//导航服务商onChange()，重新导航==>调用routing.js文件
 function reRoute(){
 	if ((!map.hasLayer(startMarker))||(!map.hasLayer(endMarker))) return;
 
 	var selector = document.getElementById("route-seletor");
 	// var text = selector.options[selector.selectedIndex].text;
 	var value = selector.options[selector.selectedIndex].value;
-	var route = CONFIG.routings[value];
-
-	switch(route.provider){
-	case "lbs":
-		getLbsJson(route.routeType, startMarker, endMarker);
-		break;
-	case "baidu":
-		getBdJson(route.routeType, route.routeOptions, startMarker, endMarker);
-		break;
-	case 'hana':
-		getHanaJson(startMarker,endMarker);
-		break;
-	case 'osrm':
-		break;
-	default:
-		break;
-
-	}
+	
+	//routing.js文件
+	getRouteJson(value, startMarker, endMarker);
+	
 }
 
