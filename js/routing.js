@@ -1,15 +1,15 @@
 /**web服务的key值**/
 
 // var baidu_ak = "rnFk0NhFaSRv7b6rXH1dpNAN";
-// var Lbs_key = "2ad58dd1832ce97111bf2f62921a968c";
+// var gaode_key = "2ad58dd1832ce97111bf2f62921a968c";
 var webServices = CONFIG.webServices;
 
 function getRouteJson(routeIndex, startMarker, endMarker, viaMarkers){
 	var route = CONFIG.routings[routeIndex];
 
 	switch(route.provider){
-	case "lbs":
-		getLbsJson(route.routeType, startMarker, endMarker,viaMarkers);
+	case "gaode":
+		getGaodeJson(route.routeType, startMarker, endMarker,viaMarkers);
 		break;
 	case "baidu":
 		getBdJson(route.routeType, route.routeOptions, startMarker, endMarker,viaMarkers);
@@ -27,7 +27,7 @@ function getRouteJson(routeIndex, startMarker, endMarker, viaMarkers){
 
 
 //获取高德驾车/步行线路json  lng,lat
-function getLbsJson(type,startMarker,endMarker,viaMarkers){
+function getGaodeJson(type,startMarker,endMarker,viaMarkers){
 	var json = [];
 	//地球坐标转成火星坐标
 	var startPoint = wgs84togcj02(startMarker.getLatLng().lng, startMarker.getLatLng().lat);
@@ -42,7 +42,7 @@ function getLbsJson(type,startMarker,endMarker,viaMarkers){
 	json.push([startMarker.getLatLng().lng, startMarker.getLatLng().lat]);
 
 	//动态加载高德js脚本
-	var url = webServices.lbs.url;
+	var url = webServices.gaode.url;
 	$.getScript(url).done(function() {
 		AMap.service(["AMap." + type], function() {
 			var options = { 
@@ -51,17 +51,17 @@ function getLbsJson(type,startMarker,endMarker,viaMarkers){
 			};
 
 		//构造类
-		var lbs_class;
+		var gaode_class;
 		if(type == "Driving"){
-			lbs_class = new AMap.Driving(options);
+			gaode_class = new AMap.Driving(options);
 		}
 		if(type == "Walking"){
-			lbs_class = new AMap.Walking(options);
+			gaode_class = new AMap.Walking(options);
 		}
 
         //根据起、终点坐标查询路线
-        lbs_class.search(startPoint, endPoint, {"waypoints":waypoints}, function(status, result){
-        // lbs_class.search(waypoints, function(status, result){
+        gaode_class.search(startPoint, endPoint, {"waypoints":waypoints}, function(status, result){
+        // gaode_class.search(waypoints, function(status, result){
         	var steps = result.routes[0].steps;
 
         	for (var i = 0; i < steps.length; i++) {

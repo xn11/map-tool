@@ -150,7 +150,7 @@ function onMapClick(e) {
 	}else if(viaMarkers.length < 3){
 		var viaMarker = L.marker(e.latlng, {icon: viaIcon,draggable:true,alt:viaMarkers.length});
 		viaMarker.on('click', removeViaMarker);
-		viaMarker.on('dragend',dragViaMarker);
+		viaMarker.on('drag',dragViaMarker);
 		map.addLayer(viaMarker);
 		// var id = ""+viaMarker._leaflet_id;
 		// viaMarkers[id] = viaMarker;
@@ -298,8 +298,8 @@ function drawGeojson(json){
 		"type": "LineString",
 		"coordinates": json
 	}];
-
-	routeline = L.geoJson(route,{style:{"color": "#FF7F00",	"weight": 5,"opacity": 0.65	}});
+	//#C105A3
+	routeline = L.geoJson(route,{style:{"color": "rgb(0, 255, 229)",	"weight": 5,"opacity": 0.90	}});
 
 	map.addLayer(routeline);
 }

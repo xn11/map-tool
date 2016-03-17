@@ -24,7 +24,7 @@ var CONFIG = {
 				"key": "rnFk0NhFaSRv7b6rXH1dpNAN",
 				"routeType": ["driving"]
 			},
-			"lbs": {
+			"gaode": {
 				"url": "http://webapi.amap.com/maps?v=1.3&key=2ad58dd1832ce97111bf2f62921a968c",
 				// "key": "2ad58dd1832ce97111bf2f62921a968c",
 				"routeType": ["Driving","Walking"]
@@ -44,14 +44,14 @@ var CONFIG = {
 	"routings":[
 		{
 			"name": "高德驾车导航",
-			"id": "lbs-driving",
-			"provider": "lbs",
+			"id": "gaode-driving",
+			"provider": "gaode",
 			"routeType": "Driving"
 		},
 		{
 			"name": "高德步行导航",
-			"id": "lbs-walking",
-			"provider": "lbs",
+			"id": "gaode-walking",
+			"provider": "gaode",
 			"routeType": "Walking"
 		},
 		{
