@@ -214,7 +214,7 @@ function showMarker(marker_id){
 	var coord = handleMarker(str);
 	marker.setLatLng(coord);
 	map.addLayer(marker);
-	map.setView(coord, 13);
+	map.setView(coord, 15);
 
 	// drawLine(startMarker,endMarker);
 	reRoute();
@@ -244,7 +244,7 @@ function resetMarker(){
 	document.getElementById("end-input").value = "";
 	map.removeLayer(startMarker);
 	map.removeLayer(endMarker);
-	map.removeLayer(polyline);
+	// map.removeLayer(polyline);
 	map.removeLayer(routeline);
 
 	for (var i = 0; i < viaMarkers.length; i++) {
@@ -252,18 +252,20 @@ function resetMarker(){
 	};
 
 	clearInfo();
-	map.setView(nj_coordinate, 13);
+	map.setView(nj_coordinate, CONFIG.zoom);
 }
 
 //互换按钮
 function reserve(){
-	var tmp = document.getElementById("start-input").value;
-	document.getElementById("start-input").value = document.getElementById("end-input").value;
-	document.getElementById("end-input").value = tmp;
-	map.removeLayer(startMarker);
-	map.removeLayer(endMarker);
-	showMarker(0);
-	showMarker(1);
+	var start_coord = startMarker.getLatLng();
+	var end_coord = endMarker.getLatLng();
+
+	$("#start-input").text(formatLatLng(end_coord));
+	$("#end-input").text(formatLatLng(start_coord));
+	startMarker.setLatLng(end_coord);
+	endMarker.setLatLng(start_coord);
+
+	reRoute();
 }
 
 

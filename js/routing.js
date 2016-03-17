@@ -1,6 +1,6 @@
 /**web服务的key值**/
 
-var baidu_ak = "rnFk0NhFaSRv7b6rXH1dpNAN";
+// var baidu_ak = "rnFk0NhFaSRv7b6rXH1dpNAN";
 // var Lbs_key = "2ad58dd1832ce97111bf2f62921a968c";
 var webServices = CONFIG.webServices;
 
@@ -107,8 +107,11 @@ function getBdJson(type,options,startMarker,endMarker,viaMarkers){
 	options["destination"] = endPoint[1] + "," + endPoint[0];
 
 	//途经点
-	var waypoints = "";
+	if("waypoints" in options){		//清空waypoints属性
+		delete options.waypoints;
+	}
 	if(viaMarkers.length > 0){
+		var waypoints = "";
 		for (var i = 0; i < viaMarkers.length; i++) {
 			waypoints = waypoints + viaMarkers[i].getLatLng().lat + "," + viaMarkers[i].getLatLng().lng + "|";
 		};
@@ -155,8 +158,8 @@ function getHanaJson(startMarker,endMarker){
 	query["endLng"] = endMarker.getLatLng().lng;
 
 	var queryString = toQueryString(query);	
-	const hostname = CONFIG.hana.hostname;
-	const port = CONFIG.hana.port;
+	const hostname = webServices.hana.hostname;
+	const port = webServices.hana.port;
 	var url = "http://" + hostname + ":" + port + "?" + queryString;
 
 	$.ajax({
