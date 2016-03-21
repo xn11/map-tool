@@ -50,3 +50,10 @@ function addURL(){
 	alert(storage.getItem(url) + "添加成功！");
 	window.location.reload();	//刷新页面
 }
+
+//底图变化后改变路线颜色
+function onBaselayerChange(e){
+	var index = $("[name='leaflet-base-layers']").index($("[name='leaflet-base-layers']:checked"));
+	pathColor = CONFIG.baseMaps[index].pathColor;
+	routeline.setStyle({"color":pathColor});
+}

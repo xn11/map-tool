@@ -4,15 +4,18 @@ var CONFIG = {
 	"baseMaps":[
 		{
 			"name":"osm",
-			"url":"http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+			"url":"http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+			"pathColor":  "rgb(0, 51, 255)"
 		},
 		{
 			"name":"osmde",
-			"url":"http://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png"
+			"url":"http://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png",
+			"pathColor":  "rgb(0, 51, 255)"
 		},
 		{
 			"name":"local",
-			"url":"mapNanjingDark3/{z}/{x}/{y}.png"
+			"url":"mapNanjingDark3/{z}/{x}/{y}.png",
+			"pathColor":  "rgb(0, 255, 229)"
 		}
 	],
 
@@ -22,20 +25,23 @@ var CONFIG = {
 			"baidu": {
 				"url": "http://api.map.baidu.com/direction/v1?",		//请求服务的url
 				"key": "rnFk0NhFaSRv7b6rXH1dpNAN",
-				"routeType": ["driving"]
+				"routeType": ["driving"],
+				"refreshInterval": -1    //刷新间隔毫秒，-1则不刷新
 			},
 			"gaode": {
-				"url": "http://webapi.amap.com/maps?v=1.3&key=2ad58dd1832ce97111bf2f62921a968c",
-				// "key": "2ad58dd1832ce97111bf2f62921a968c",
-				"routeType": ["Driving","Walking"]
+				"url": "http://webapi.amap.com/maps?v=1.3&",
+				"key": "2ad58dd1832ce97111bf2f62921a968c",
+				"routeType": ["Driving","Walking"],
+				"refreshInterval": 500
 			},
 			"hana": {
 				"hostname": "127.0.0.1",
-				"port": 1337
+				"port": 1337,
+				"refreshInterval": -1   
 			},
 			"osrm": {
-				"url": "",
-				"key": ""
+				"url": "http://localhost:5000/viaroute?",
+				"refreshInterval": 100
 			},
 			
 		},	
@@ -47,12 +53,6 @@ var CONFIG = {
 			"id": "gaode-driving",
 			"provider": "gaode",
 			"routeType": "Driving"
-		},
-		{
-			"name": "高德步行导航",
-			"id": "gaode-walking",
-			"provider": "gaode",
-			"routeType": "Walking"
 		},
 		{
 			"name": "百度导航",

@@ -118,6 +118,7 @@ function initMap(){
 	L.control.layers(baseLayers).addTo(map);
 
 	map.on('click', onMapClick);
+	map.on('baselayerchange', onBaselayerChange);
 }
 
 //初始化selector导航
@@ -266,6 +267,8 @@ function reserve(){
 // 	map.addLayer(polyline);
 // }
 
+
+var pathColor = CONFIG.baseMaps[0].pathColor;	//路线颜色
 //画导航线路
 function drawGeojson(json){
 	if(map.hasLayer(routeline)){
@@ -276,15 +279,14 @@ function drawGeojson(json){
 		"type": "LineString",
 		"coordinates": json
 	}];
-	//#C105A3
-	routeline = L.geoJson(route,{style:{"color": "rgb(0, 255, 229)",	"weight": 5,"opacity": 0.90	}});
+	//#C105A3 rgb(0, 255, 229)
+	routeline = L.geoJson(route,{style:{"color": pathColor,	"weight": 5,"opacity": 0.65	}});
 
 	map.addLayer(routeline);
 	routeline.on('click', onRoutelineClick);
 }
 
 function onRoutelineClick(e){
-	// alert("clicked!");
 	if(viaMarkers.length < 3){
 		var viaMarker = L.marker(e.latlng, {icon: viaIcon,draggable:true,alt:viaMarkers.length});
 		viaMarker.on('click', removeViaMarker);
@@ -293,20 +295,20 @@ function onRoutelineClick(e){
 		map.addLayer(viaMarker);
 		viaMarkers.push(viaMarker);
 	}
-	reRoute();
-}
-
-//每隔1s reRoute()一次
-var interval = null;
-function dragstartViaMarker(e){
-	interval = setInterval("reRoute()",1000);
-	console.log("in");
 	// reRoute();
 }
 
+//viaMarker事件设置
+var interval = null;	//每隔1s reRoute()一次
+var refreshInterval = -1;	//刷新间隔时间
+function dragstartViaMarker(e){
+	if(refreshInterval > 0){
+		interval = setInterval("reRoute()",refreshInterval);
+	}
+}
 function dragendViaMarker(e){
-	interval = null;
-	console.log("end");
+	clearInterval(interval);
+	reRoute();
 }
 
 function removeViaMarker(e){
@@ -324,11 +326,12 @@ function reRoute(){
 	if ((!map.hasLayer(startMarker))||(!map.hasLayer(endMarker))) return;
 
 	var selector = document.getElementById("route-seletor");
-	// var text = selector.options[selector.selectedIndex].text;
 	var value = selector.options[selector.selectedIndex].value;
 	
 	//routing.js文件
-	getRouteJson(value, startMarker, endMarker, viaMarkers);
-	
+	var provider = getRouteJson(value, startMarker, endMarker, viaMarkers);
+
+	//更新provider配置的刷新间隔
+	refreshInterval = provider.refreshInterval;	
 }
 

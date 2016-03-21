@@ -1,7 +1,7 @@
 /******工具类*****************************************************************************/
 
 function formatLatLng(latlng){
-	return parseFloat(latlng.lat).toFixed(6) + ',' + parseFloat(latlng.lng).toFixed(4) ;
+	return parseFloat(latlng.lat).toFixed(6) + ',' + parseFloat(latlng.lng).toFixed(6) ;
 }
 
 function toQueryString(queryArray){

@@ -18,11 +18,13 @@ function getRouteJson(routeIndex, startMarker, endMarker, viaMarkers){
 		getHanaJson(startMarker,endMarker);
 		break;
 	case 'osrm':
+		getOsrmJson(startMarker, endMarker,viaMarkers);
 		break;
 	default:
 		break;
-
 	}
+
+	return webServices[route.provider];
 }
 
 
@@ -42,7 +44,7 @@ function getGaodeJson(type,startMarker,endMarker,viaMarkers){
 	json.push([startMarker.getLatLng().lng, startMarker.getLatLng().lat]);
 
 	//动态加载高德js脚本
-	var url = webServices.gaode.url;
+	var url = webServices.gaode.url + "key=" + webServices.gaode.key;
 	$.getScript(url).done(function() {
 		AMap.service(["AMap." + type], function() {
 			var options = { 
@@ -178,4 +180,78 @@ function getHanaJson(startMarker,endMarker){
 		displayInfo(instruction);
 		drawGeojson(json);
 	});
+}
+
+
+
+//OSRM导航路线json  lat,lng
+function getOsrmJson(startMarker,endMarker,viaMarkers){
+	var json = [];
+
+	var options = [];
+	options["output"] = "json";
+	options["jsonp"] = "osrmCallback";
+	options["instructions"] = "true";
+
+	var queryString = toQueryString(options);
+	queryString = queryString + "&loc=" + formatLatLng(startMarker.getLatLng());
+	for (var i = 0; i < viaMarkers.length; i++) {
+		queryString = queryString + "&loc=" + formatLatLng(viaMarkers[i].getLatLng());
+	}
+	queryString = queryString + "&loc=" + formatLatLng(endMarker.getLatLng());
+
+	var url = webServices.osrm.url + queryString;
+
+	// add script to DOM
+	var script = document.createElement('script');
+	script.type = 'text/javascript';
+	script.src = url;
+	document.head.appendChild(script);		
+
+}
+
+function osrmCallback(data){
+	var routes = osrm_decode(data.route_geometry, 6);
+	var json = [];
+	// displayInfo(instruction);
+
+	for (var i = 0; i < routes.length; i++) {
+		json.push([routes[i][1],routes[i][0]]);
+	};
+
+	drawGeojson(json);
+
+	//参考OSRM.Localization文件的direction——————————————————————————————————————————————————————————————————
+
+	// console.log(data);
+	console.log(data.route_instructions[0].toString());
+}
+
+
+//decode compressed route geometry osrm解码
+function osrm_decode(encoded, precision) {
+	precision = Math.pow(10, -precision);
+	var len = encoded.length, index=0, lat=0, lng = 0, array = [];
+	while (index < len) {
+		var b, shift = 0, result = 0;
+		do {
+			b = encoded.charCodeAt(index++) - 63;
+			result |= (b & 0x1f) << shift;
+			shift += 5;
+		} while (b >= 0x20);
+		var dlat = ((result & 1) ? ~(result >> 1) : (result >> 1));
+		lat += dlat;
+		shift = 0;
+		result = 0;
+		do {
+			b = encoded.charCodeAt(index++) - 63;
+			result |= (b & 0x1f) << shift;
+			shift += 5;
+		} while (b >= 0x20);
+		var dlng = ((result & 1) ? ~(result >> 1) : (result >> 1));
+		lng += dlng;
+		//array.push( {lat: lat * precision, lng: lng * precision} );
+		array.push( [lat * precision, lng * precision] );
+	}
+	return array;
 }
