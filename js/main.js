@@ -147,14 +147,6 @@ function onMapClick(e) {
 		endMarker.on('dragend',dragMarker);
 		map.addLayer(endMarker);
 		document.getElementById("end-input").value = value;
-	}else if(viaMarkers.length < 3){
-		var viaMarker = L.marker(e.latlng, {icon: viaIcon,draggable:true,alt:viaMarkers.length});
-		viaMarker.on('click', removeViaMarker);
-		viaMarker.on('drag',dragViaMarker);
-		map.addLayer(viaMarker);
-		// var id = ""+viaMarker._leaflet_id;
-		// viaMarkers[id] = viaMarker;
-		viaMarkers.push(viaMarker);
 	}else{
 		return;
 	}
@@ -185,20 +177,6 @@ function hideMarker(e){
 		document.getElementById("end-input").value = "";
 	}
 	map.removeLayer(routeline);
-}
-
-function dragViaMarker(e){
-	reRoute();
-}
-
-function removeViaMarker(e){
-	var index = e.target.options.alt;
-	map.removeLayer(viaMarkers[index]);
-	viaMarkers.splice(index, 1);
-	for (var i = 0; i < viaMarkers.length; i++) {
-		viaMarkers[i].options.alt = i;
-	};
-	reRoute();
 }
 
 //显示按钮
@@ -302,6 +280,43 @@ function drawGeojson(json){
 	routeline = L.geoJson(route,{style:{"color": "rgb(0, 255, 229)",	"weight": 5,"opacity": 0.90	}});
 
 	map.addLayer(routeline);
+	routeline.on('click', onRoutelineClick);
+}
+
+function onRoutelineClick(e){
+	// alert("clicked!");
+	if(viaMarkers.length < 3){
+		var viaMarker = L.marker(e.latlng, {icon: viaIcon,draggable:true,alt:viaMarkers.length});
+		viaMarker.on('click', removeViaMarker);
+		viaMarker.on('dragstart',dragstartViaMarker);	//开始拖拽，每隔1s reRoute()一次
+		viaMarker.on('dragend', dragendViaMarker);		//拖拽结束，取消interval
+		map.addLayer(viaMarker);
+		viaMarkers.push(viaMarker);
+	}
+	reRoute();
+}
+
+//每隔1s reRoute()一次
+var interval = null;
+function dragstartViaMarker(e){
+	interval = setInterval("reRoute()",1000);
+	console.log("in");
+	// reRoute();
+}
+
+function dragendViaMarker(e){
+	interval = null;
+	console.log("end");
+}
+
+function removeViaMarker(e){
+	var index = e.target.options.alt;
+	map.removeLayer(viaMarkers[index]);
+	viaMarkers.splice(index, 1);
+	for (var i = 0; i < viaMarkers.length; i++) {
+		viaMarkers[i].options.alt = i;
+	};
+	reRoute();
 }
 
 //导航服务商onChange()，重新导航==>调用routing.js文件
