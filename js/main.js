@@ -139,34 +139,77 @@ function onMapClick(e) {
 	if(!map.hasLayer(startMarker)){
 		startMarker = L.marker(e.latlng, {icon: startIcon,draggable:true});
 		startMarker.on('click', hideMarker);
-		startMarker.on('dragend',dragMarker);
+		startMarker.on('dragstart',dragstartMarker);
+		startMarker.on('drag',dragMarker);
+		startMarker.on('dragend',dragendMarker);
 		map.addLayer(startMarker);
 		document.getElementById("start-input").value = value;
 	}else if (!map.hasLayer(endMarker)) {
 		endMarker = L.marker(e.latlng, {icon: endIcon,draggable:true});
 		endMarker.on('click', hideMarker);
-		endMarker.on('dragend',dragMarker);
+		endMarker.on('dragstart',dragstartMarker);
+		endMarker.on('drag',dragMarker);
+		endMarker.on('dragend',dragendMarker);
 		map.addLayer(endMarker);
 		document.getElementById("end-input").value = value;
 	}else{
 		return;
 	}
-
 	// drawLine(startMarker,endMarker);
 	// map.setView(e.latlng);
 	reRoute("onMapClick");
 }
 
+
+//viaMarker事件设置
+var interval = null;	//每隔1s reRoute()一次
+var refreshInterval = -1;	//刷新间隔时间
+function dragstartMarker(e){
+	if(refreshInterval > 0){
+		interval = setInterval("reRoute('dragstartMarker')",refreshInterval);
+	}
+}
+function dragendMarker(e){
+	clearInterval(interval);
+	reRoute("dragendMarker");
+}
+
+function removeViaMarker(e){
+	var index = e.target.options.alt;
+	map.removeLayer(viaMarkers[index]);
+	viaMarkers.splice(index, 1);
+	for (var i = 0; i < viaMarkers.length; i++) {
+		viaMarkers[i].options.alt = i;
+	};
+	reRoute("removeViaMarker");
+}
+
 //Marker事件处理
+// function dragstartMarker(e){
+// 	if(refreshInterval > 0){
+// 		interval = setInterval("reRoute('dragstartMarker');",refreshInterval);
+// 	}
+// }
+
 function dragMarker(e){
+	updateDisplay(e);
+}
+
+// function dragendMarker(e){
+// 	clearInterval(interval);
+// 	updateDisplay(e);
+// 	reRoute("dragendMarker");
+// }
+
+function updateDisplay(e){
+	// document.getElementById("start-input").value = formatLatLng(startMarker.getLatLng);
+	// document.getElementById("end-input").value = formatLatLng(endMarker.getLatLng);
 	var value = formatLatLng(e.target.getLatLng());
 	if(e.target.options.icon.options.iconUrl.indexOf('start')>=0){
 		document.getElementById("start-input").value = value;
 	}else{
 		document.getElementById("end-input").value = value;
 	}
-	// drawLine(startMarker,endMarker);
-	reRoute("dragMarker");
 }
 
 function hideMarker(e){
@@ -320,35 +363,11 @@ function onRoutelineClick(e){
 	if(viaMarkers.length < 3){
 		var viaMarker = L.marker(e.latlng, {icon: viaIcon,draggable:true,alt:viaMarkers.length});
 		viaMarker.on('click', removeViaMarker);
-		viaMarker.on('dragstart',dragstartViaMarker);	//开始拖拽，每隔1s reRoute()一次
-		viaMarker.on('dragend', dragendViaMarker);		//拖拽结束，取消interval
+		viaMarker.on('dragstart',dragstartMarker);	//开始拖拽，每隔1s reRoute()一次
+		viaMarker.on('dragend', dragendMarker);		//拖拽结束，取消interval
 		map.addLayer(viaMarker);
 		viaMarkers.push(viaMarker);
 	}
-}
-
-//viaMarker事件设置
-var interval = null;	//每隔1s reRoute()一次
-var refreshInterval = -1;	//刷新间隔时间
-function dragstartViaMarker(e){
-	if(refreshInterval > 0){
-		interval = setInterval("reRoute('dragstartViaMarker')",refreshInterval);
-	}
-}
-var via_points;
-function dragendViaMarker(e){
-	clearInterval(interval);
-	reRoute("dragendViaMarker");
-}
-
-function removeViaMarker(e){
-	var index = e.target.options.alt;
-	map.removeLayer(viaMarkers[index]);
-	viaMarkers.splice(index, 1);
-	for (var i = 0; i < viaMarkers.length; i++) {
-		viaMarkers[i].options.alt = i;
-	};
-	reRoute("removeViaMarker");
 }
 
 //导航服务商onChange()，重新导航==>调用routing.js文件

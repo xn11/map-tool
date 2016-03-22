@@ -241,12 +241,19 @@ function osrmCallback(data){
 	displayInfo(instruction);
 	drawGeojson(json);
 
-	//重置marker位置，将marker放置在路段上
-	resetMarker(0, data.via_points[0]);
-	resetMarker(1, data.via_points[data.via_points.length-1]);
+	//如果调用事件不为拖拽中,则重置marker位置，将marker放置在路段上
+	// if($("script[id *= 'osrmscript']").attr("id") != "osrmscript_dragstartMarker"){
+	// 	resetMarker(0, data.via_points[0]);
+	// 	resetMarker(1, data.via_points[data.via_points.length - 1]);
+	// }
 
 	//如果调用事件为拖拽结束，则重置viaMarker
-	if($("script[id *= 'osrmscript']").attr("id") == "osrmscript_dragendViaMarker"){
+	if($("script[id *= 'osrmscript']").attr("id") != "osrmscript_dragstartMarker"){
+		resetMarker(0, data.via_points[0]);
+		resetMarker(1, data.via_points[data.via_points.length - 1]);
+		document.getElementById("start-input").value = formatLatLng(startMarker.getLatLng());
+		document.getElementById("end-input").value = formatLatLng(endMarker.getLatLng());
+
 		for (var i = 1; i < data.via_points.length - 1; i++) {
 			resetMarker( -i, data.via_points[i]);
 		};		
