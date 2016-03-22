@@ -39,11 +39,11 @@ $(document).ready(function(){
 	});
 
 	$("#reverse-button").click(function(){
-		reserve();
+		reserveButton();
 	});
 
 	$("#reset-button").click(function(){
-		resetMarker();
+		resetButton();
 	});
 
 	$("#add-url-button").click(function(){
@@ -216,9 +216,39 @@ function handleMarker(str){
 		return [first, second];
 	}
 }
+//处理输入的坐标值  return [lat,lng]
+function handleMarker(str){
+	if(str=="")
+		return;
+
+	if(str.match(/^\s*[-+]?[0-9]*\.?[0-9]+\s*[\s,;]\s*[-+]?[0-9]*\.?[0-9]+\s*$/)){
+
+		var coord = str.trim().split(/[\s,;]/);	//支持空格、逗号、分号分隔
+		var first = coord[0];
+		var second = coord[coord.length - 1];
+
+		if(parseFloat(first) > 90){
+			return [second, first];		//经纬度交换位置
+		}
+
+		return [first, second];
+	}
+}
+
+//重置marker位置
+function resetMarker(marker_id, latlng){
+	var marker = startMarker;
+	if(marker_id > 0){
+		marker = endMarker;
+	}
+	if(marker_id < 0){
+		marker = viaMarkers[ -marker_id - 1];
+	}
+	marker.setLatLng(latlng);	
+}
 
 //重置按钮
-function resetMarker(){
+function resetButton(){
 	document.getElementById("start-input").value = "";
 	document.getElementById("end-input").value = "";
 	map.removeLayer(startMarker);
@@ -235,7 +265,7 @@ function resetMarker(){
 }
 
 //互换按钮
-function reserve(){
+function reserveButton(){
 	var start_coord = startMarker.getLatLng();
 	var end_coord = endMarker.getLatLng();
 
@@ -269,7 +299,7 @@ function reserve(){
 
 
 var pathColor = CONFIG.baseMaps[0].pathColor;	//路线颜色
-//画导航线路
+//画导航线路  lng,lat
 function drawGeojson(json){
 	if(map.hasLayer(routeline)){
 		map.removeLayer(routeline);		

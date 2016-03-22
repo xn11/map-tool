@@ -8,19 +8,19 @@ function getRouteJson(routeIndex, startMarker, endMarker, viaMarkers){
 	var route = CONFIG.routings[routeIndex];
 
 	switch(route.provider){
-	case "gaode":
+		case "gaode":
 		getGaodeJson(route.routeType, startMarker, endMarker,viaMarkers);
 		break;
-	case "baidu":
+		case "baidu":
 		getBdJson(route.routeType, route.routeOptions, startMarker, endMarker,viaMarkers);
 		break;
-	case 'hana':
+		case 'hana':
 		getHanaJson(startMarker,endMarker);
 		break;
-	case 'osrm':
+		case 'osrm':
 		getOsrmJson(startMarker, endMarker,viaMarkers);
 		break;
-	default:
+		default:
 		break;
 	}
 
@@ -28,7 +28,10 @@ function getRouteJson(routeIndex, startMarker, endMarker, viaMarkers){
 }
 
 
-//获取高德驾车/步行线路json  lng,lat
+/*
+* 获取高德驾车/步行线路json  
+* lng,lat
+*/
 function getGaodeJson(type,startMarker,endMarker,viaMarkers){
 	var json = [];
 	//地球坐标转成火星坐标
@@ -80,11 +83,14 @@ function getGaodeJson(type,startMarker,endMarker,viaMarkers){
         	drawGeojson(json);
         });
     });
-	})
-	
+})
+
 }
 
-//百度导航路线json  lat,lng
+/*
+* 百度导航路线json  
+* lat,lng
+*/
 function getBdJson(type,options,startMarker,endMarker,viaMarkers){
 	var json = [];
 	// var query = new Array();
@@ -148,7 +154,11 @@ function getBdJson(type,options,startMarker,endMarker,viaMarkers){
 	});
 }
 
-//Hana调C++方法  lat,lng
+
+/*
+* Hana调C++方法  
+* lat,lng
+*/
 function getHanaJson(startMarker,endMarker){
 	var startPoint = [startMarker.getLatLng().lat, startMarker.getLatLng().lng];
 	var endPoint = [endMarker.getLatLng().lat, endMarker.getLatLng().lng];
@@ -184,7 +194,10 @@ function getHanaJson(startMarker,endMarker){
 
 
 
-//OSRM导航路线json  lat,lng
+/*
+* OSRM导航路线json  
+* lat,lng
+*/
 function getOsrmJson(startMarker,endMarker,viaMarkers){
 	var json = [];
 
@@ -207,28 +220,34 @@ function getOsrmJson(startMarker,endMarker,viaMarkers){
 	script.type = 'text/javascript';
 	script.src = url;
 	document.head.appendChild(script);		
-
 }
-
+//回调函数
 function osrmCallback(data){
-	var routes = osrm_decode(data.route_geometry, 6);
+	var routes = osrm_decode(data.route_geometry, 6);	//解码	
 	var json = [];
-	// displayInfo(instruction);
-
 	for (var i = 0; i < routes.length; i++) {
 		json.push([routes[i][1],routes[i][0]]);
+	}
+
+	var instructions = data.route_instructions;
+	var instruction = [];
+	for (var i = 0; i < instructions.length; i++) {
+		instruction.push(osrm_buildInstruction(instructions[i]));
 	};
 
+	displayInfo(instruction);
 	drawGeojson(json);
 
-	//参考OSRM.Localization文件的direction——————————————————————————————————————————————————————————————————
+	//重置marker位置，将marker放置在路段上
+	resetMarker(0, data.via_points[0]);
+	resetMarker(1, data.via_points[data.via_points.length-1]);
 
-	// console.log(data);
-	console.log(data.route_instructions[0].toString());
+	for (var i = 1; i < data.via_points.length - 1; i++) {
+		resetMarker( -i, data.via_points[i]);
+	};
 }
-
-
-//decode compressed route geometry osrm解码
+//osrm解码
+//decode compressed route geometry 
 function osrm_decode(encoded, precision) {
 	precision = Math.pow(10, -precision);
 	var len = encoded.length, index=0, lat=0, lng = 0, array = [];
@@ -254,4 +273,47 @@ function osrm_decode(encoded, precision) {
 		array.push( [lat * precision, lng * precision] );
 	}
 	return array;
+}
+//构造instruction信息
+function osrm_buildInstruction(info){
+	var res = osrm_instruction["DIRECTION_" + info[0]];
+	res = res.replace(/%s/, info[1]).replace(/%d/, osrm_instruction[info[6]]).replace(/%m/, info[2] + "米");
+	return res;
+}
+//osrm instruction对应文字
+var osrm_instruction = {
+	// directions
+	"N": "向北",
+	"E": "向东",
+	"S": "向南",
+	"W": "向西",
+	"NE": "东北",
+	"SE": "东南",
+	"SW": "西南",
+	"NW": "西北",
+	// driving directions
+	// %s: road name
+	// %d: direction
+	// %m: distance
+	"DIRECTION_0":"进入<b>%s</b>",
+	"DIRECTION_1":"继续行驶%m",
+	"DIRECTION_2":"稍向右转进入<b>%s</b>，行驶%m",
+	"DIRECTION_3":"右转进入<b>%s</b>，行驶%m",
+	"DIRECTION_4":"向右急转进入<b>%s</b>，行驶%m",
+	"DIRECTION_5":"掉头进入<b>%s</b>，行驶%m",
+	"DIRECTION_6":"向左急转进入<b>%s</b>，行驶%m",
+	"DIRECTION_7":"左转进入<b>%s</b>，行驶%m",
+	"DIRECTION_8":"稍向左转进入<b>%s</b>，行驶%m",
+	"DIRECTION_10":"沿<b>%d</b>方向进入<b>%s</b>，行驶%m",
+	"DIRECTION_11-1":"进入环状交叉路并在第1个出口离开，进入<b>%s</b>,，行驶%m",
+	"DIRECTION_11-2":"进入环状交叉路并在第2个出口离开，进入<b>%s</b>，行驶%m",
+	"DIRECTION_11-3":"进入环状交叉路并在第3个出口离开，进入<b>%s</b>，行驶%m",
+	"DIRECTION_11-4":"进入环状交叉路并在第4个出口离开，进入<b>%s</b>，行驶%m",
+	"DIRECTION_11-5":"进入环状交叉路并在第5个出口离开，进入<b>%s</b>，行驶%m",
+	"DIRECTION_11-6":"进入环状交叉路并在第6个出口离开，进入<b>%s</b>，行驶%m",
+	"DIRECTION_11-7":"进入环状交叉路并在第7个出口离开，进入<b>%s</b>，行驶%m",
+	"DIRECTION_11-8":"进入环状交叉路并在第8个出口离开，进入<b>%s</b>，行驶%m",
+	"DIRECTION_11-9":"进入环状交叉路并在第9个出口离开，进入<b>%s</b>，行驶%m",
+	"DIRECTION_11-x":"进入环状交叉路并从出口离开，进入<b>%s</b>，行驶%m",
+	"DIRECTION_15":"到达终点"
 }
