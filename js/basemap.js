@@ -55,5 +55,6 @@ function addURL(){
 function onBaselayerChange(e){
 	var index = $("[name='leaflet-base-layers']").index($("[name='leaflet-base-layers']:checked"));
 	pathColor = CONFIG.baseMaps[index].pathColor;
-	routeline.setStyle({"color":pathColor});
+	if(routeline != undefined)
+		routeline.setStyle({"color":pathColor});
 }

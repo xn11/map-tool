@@ -4,21 +4,22 @@
 // var gaode_key = "2ad58dd1832ce97111bf2f62921a968c";
 var webServices = CONFIG.webServices;
 
-function getRouteJson(routeIndex, startMarker, endMarker, viaMarkers){
+//callName为调用reRoute的方法名
+function getRouteJson(routeIndex, callName){
 	var route = CONFIG.routings[routeIndex];
 
 	switch(route.provider){
 		case "gaode":
-		getGaodeJson(route.routeType, startMarker, endMarker,viaMarkers);
+		getGaodeJson(route.routeType);
 		break;
 		case "baidu":
-		getBdJson(route.routeType, route.routeOptions, startMarker, endMarker,viaMarkers);
+		getBdJson(route.routeType, route.routeOptions);
 		break;
 		case 'hana':
-		getHanaJson(startMarker,endMarker);
+		getHanaJson();
 		break;
 		case 'osrm':
-		getOsrmJson(startMarker, endMarker,viaMarkers);
+		getOsrmJson(callName);
 		break;
 		default:
 		break;
@@ -32,7 +33,7 @@ function getRouteJson(routeIndex, startMarker, endMarker, viaMarkers){
 * 获取高德驾车/步行线路json  
 * lng,lat
 */
-function getGaodeJson(type,startMarker,endMarker,viaMarkers){
+function getGaodeJson(type){
 	var json = [];
 	//地球坐标转成火星坐标
 	var startPoint = wgs84togcj02(startMarker.getLatLng().lng, startMarker.getLatLng().lat);
@@ -91,7 +92,7 @@ function getGaodeJson(type,startMarker,endMarker,viaMarkers){
 * 百度导航路线json  
 * lat,lng
 */
-function getBdJson(type,options,startMarker,endMarker,viaMarkers){
+function getBdJson(type,options){
 	var json = [];
 	// var query = new Array();
 	// query["mode"] = type;
@@ -159,7 +160,7 @@ function getBdJson(type,options,startMarker,endMarker,viaMarkers){
 * Hana调C++方法  
 * lat,lng
 */
-function getHanaJson(startMarker,endMarker){
+function getHanaJson(){
 	var startPoint = [startMarker.getLatLng().lat, startMarker.getLatLng().lng];
 	var endPoint = [endMarker.getLatLng().lat, endMarker.getLatLng().lng];
 
@@ -198,7 +199,7 @@ function getHanaJson(startMarker,endMarker){
 * OSRM导航路线json  
 * lat,lng
 */
-function getOsrmJson(startMarker,endMarker,viaMarkers){
+function getOsrmJson(callName){
 	var json = [];
 
 	var options = [];
@@ -215,10 +216,12 @@ function getOsrmJson(startMarker,endMarker,viaMarkers){
 
 	var url = webServices.osrm.url + queryString;
 
-	// add script to DOM
+	// 清除已经载入的osrm脚本，添加新的节点
+	$("script[id *= 'osrmscript']").remove();
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
 	script.src = url;
+	script.id = "osrmscript_" + callName;	//传递callName
 	document.head.appendChild(script);		
 }
 //回调函数
@@ -242,9 +245,12 @@ function osrmCallback(data){
 	resetMarker(0, data.via_points[0]);
 	resetMarker(1, data.via_points[data.via_points.length-1]);
 
-	for (var i = 1; i < data.via_points.length - 1; i++) {
-		resetMarker( -i, data.via_points[i]);
-	};
+	//如果调用事件为拖拽结束，则重置viaMarker
+	if($("script[id *= 'osrmscript']").attr("id") == "osrmscript_dragendViaMarker"){
+		for (var i = 1; i < data.via_points.length - 1; i++) {
+			resetMarker( -i, data.via_points[i]);
+		};		
+	}
 }
 //osrm解码
 //decode compressed route geometry 

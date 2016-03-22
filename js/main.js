@@ -154,7 +154,7 @@ function onMapClick(e) {
 
 	// drawLine(startMarker,endMarker);
 	// map.setView(e.latlng);
-	reRoute();
+	reRoute("onMapClick");
 }
 
 //Marker事件处理
@@ -166,7 +166,7 @@ function dragMarker(e){
 		document.getElementById("end-input").value = value;
 	}
 	// drawLine(startMarker,endMarker);
-	reRoute();
+	reRoute("dragMarker");
 }
 
 function hideMarker(e){
@@ -196,7 +196,7 @@ function showMarker(marker_id){
 	map.setView(coord, 15);
 
 	// drawLine(startMarker,endMarker);
-	reRoute();
+	reRoute("showMarker");
 }
 //处理输入的坐标值  return [lat,lng]
 function handleMarker(str){
@@ -274,7 +274,7 @@ function reserveButton(){
 	startMarker.setLatLng(end_coord);
 	endMarker.setLatLng(start_coord);
 
-	reRoute();
+	reRoute("reserveButton");
 }
 
 
@@ -325,7 +325,6 @@ function onRoutelineClick(e){
 		map.addLayer(viaMarker);
 		viaMarkers.push(viaMarker);
 	}
-	// reRoute();
 }
 
 //viaMarker事件设置
@@ -333,12 +332,13 @@ var interval = null;	//每隔1s reRoute()一次
 var refreshInterval = -1;	//刷新间隔时间
 function dragstartViaMarker(e){
 	if(refreshInterval > 0){
-		interval = setInterval("reRoute()",refreshInterval);
+		interval = setInterval("reRoute('dragstartViaMarker')",refreshInterval);
 	}
 }
+var via_points;
 function dragendViaMarker(e){
 	clearInterval(interval);
-	reRoute();
+	reRoute("dragendViaMarker");
 }
 
 function removeViaMarker(e){
@@ -348,18 +348,19 @@ function removeViaMarker(e){
 	for (var i = 0; i < viaMarkers.length; i++) {
 		viaMarkers[i].options.alt = i;
 	};
-	reRoute();
+	reRoute("removeViaMarker");
 }
 
 //导航服务商onChange()，重新导航==>调用routing.js文件
-function reRoute(){
+//参数为调用该方法的方法名
+function reRoute(callName){
 	if ((!map.hasLayer(startMarker))||(!map.hasLayer(endMarker))) return;
 
 	var selector = document.getElementById("route-seletor");
 	var value = selector.options[selector.selectedIndex].value;
 	
 	//routing.js文件
-	var provider = getRouteJson(value, startMarker, endMarker, viaMarkers);
+	var provider = getRouteJson(value, callName);
 
 	//更新provider配置的刷新间隔
 	refreshInterval = provider.refreshInterval;	
