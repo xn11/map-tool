@@ -32,7 +32,7 @@ var CONFIG = {
 				"url": "http://webapi.amap.com/maps?v=1.3&",
 				"key": "2ad58dd1832ce97111bf2f62921a968c",
 				"routeType": ["Driving","Walking"],
-				"refreshInterval": 500
+				"refreshInterval": -1
 			},
 			"hana": {
 				"hostname": "127.0.0.1",
