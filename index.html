@@ -43,24 +43,26 @@
 				<div class="input-area">
 					<label for="start-input">起点： </label>
 					<input id="start-input" name="start-input" class="input-text" type="text" placeholder="请输入起点" />
+					<div id="clear-start-input" class="clear-icon cancel-icon"></div>
 					<a class="button right-button" id="show_start_marker">显示</a>
 				</div>
 				<div class="input-area">
 					<label for="end-input">终点： </label>
 					<input id="end-input" name="end-input" class="input-text" type="text" placeholder="请输入终点" />
+					<div id="clear-end-input" class="clear-icon cancel-icon"></div>
 					<a class="button right-button" id="show_end_marker">显示</a>
 				</div>
 				<div class="button-area">
 					<!-- <a class="button left-button grey-button" id="reset-button" onclick="reset()">重置</a> -->
-					<select id="route-seletor" onChange="reRoute('onChange')">
+					<select id="route-seletor" onChange="clearInfo();reRoute('onChange')">
 						<!-- <option value="lbs-driving">高德驾车导航</option>
 						<option value="gaode-walking">高德步行导航</option>
 						<option value="baidu">百度导航</option>
 						<option value="hana">HANA导航</option>
 						<option value="osrm">OSRM导航</option> -->
 					</select>
-					<a class="button right-button" id="reverse-button">互换</a>
 					<a class="button right-button grey-button" id="reset-button">重置</a>
+					<a class="button right-button" id="reverse-button">互换</a>
 				</div>
 			</div>
 		</div>

@@ -80,21 +80,50 @@ html, body
 	top:0px;
 	height:40px;
 }
-.input-area
-{
-	padding: 0 0 8px 10px;
+
+/*================*/
+.input-area {
+	height: 30px;
+	display: flex;	
+	flex-flow: row nowrap;
+	align-items: baseline;
+	padding-bottom: 2px;
+	margin-left: 10px;
 }
+.start-input {
+	flex: 0 0 auto;
+}
+.input-text {
+	flex: 1;
+	padding-left: 5px;
+    font-size: 12px;
+    height: 18px;
+}
+.clear-icon {
+	height: 20px;
+	flex: 0 0 25px;
+	align-self: stretch;
+	cursor: pointer;
+	display: none; 
+}
+.right-button {
+	flex: 0 0 auto;
+	margin-right: 10px;
+	margin-left: 5px;
+}
+/*===================*/
 .button-area
 {
 	padding-top: 5px;
+	display: flex;
 }
-.input-text
+/*.input-text
 {
 	font-size: 12px;
-	width: 205px;
-	height: 18px;
+	width: 205px
+;	height: 18px;
 	padding-left: 5px;
-}
+}*/
 
 #start-input
 {
@@ -115,25 +144,25 @@ html, body
 	-webkit-border-radius: 5px;
 	text-decoration: none;
 	outline-style: none;
-	vertical-align: 1px;	
+	/*vertical-align: 1px;	*/
 	/*font-family: Verdana, Arial, Helvetica, sans-serif;*/
 	background: #88C5E1;
 	color: #fff;	
 	font-size: .875rem;
 	line-height: 24px;
 }
-.right-button
+/*.right-button
 {
 	float: right;
 	margin-right: 10px;
-}
+}*/
 .left-button
 {
 	float: left;
 	margin-left: 10px;
 }
 #route-seletor{
-	margin: 2px 0 0 50px;
+	margin: 2px 56px 0 45px;
     border: 0;
     font: 12px 微软雅黑,黑体,Arial,Tahoma,sans-serif,serif;
     width: 120px;
@@ -144,6 +173,13 @@ html, body
 
 
 /********图标********/
+/*.clear-icon
+{
+	cursor: pointer;
+	width: 20px;
+	height: 20px;	
+}*/
+
 .panel-icon
 {
 	cursor: pointer;
@@ -221,7 +257,50 @@ html, body
 }
 
 /***********百度输出信息css****************************/
-.bd-info{
-	margin-right: 20px;
-    line-height: 2;
+.info-title {
+	position: relative;
+    padding: 2px 8px;
+    margin-bottom: 2px;
+    border-top: 1px solid #e6e6e6;
+    border-bottom: 1px solid #e6e6e6;
+    background: #fafafa;
+}
+
+.info-title h3 {
+	margin-top: 0;
+    font-size: 13px;
+    margin-bottom: 1px;
+    color: #565656;
+    line-height: 1.5;
+    word-wrap: break-word;
+    font-weight: 700;
+}
+
+.info-title p {
+	font-size: 12px;
+    margin-bottom: 1px;
+    color: #666;
+    margin: 0;
+}
+
+.bd-info {
+	display: block;
+    margin-top: 15px;
+    color: #565656;
+    line-height: 1.5;
+    word-wrap: break-word;
+    margin-right: 30px;
+}
+
+.bd-info li{
+	position: relative;
+    line-height: 20px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 3px;
+    padding-top: 3px;
+}
+
+.bd-info b {
+    font-weight: bold;
+    color: #D88B3A;
 }

@@ -24,13 +24,32 @@ function stringToArray(str){
 	return res;
 }
 
-function displayInfo(infos){
-	var info = "<ol class='bd-info'>";
-	for (var i = 0; i < infos.length; i++) {
-		info = info + "<li>" + infos[i] + "</li>";
+function displayInfo(infos, title, extras){
+	var div = "<div class='info-title'>";
+
+	if (title != "" && title != undefined) {
+		div = div + "<h3>" + title + "</h3>";
 	}
-	info += "</div>";
-	$("#display-info").html(info);
+
+	if(extras != "" && extras != undefined){	
+		div += "<table>";	
+		for (var i = 0; i < extras.length; i++) {
+			div = div + "<tr>" + extras[i] + "</tr>";
+		}
+		div += "</table>";
+	}
+
+	div += "</div>";
+
+	if(infos != null && infos.length > 0){
+		div += "<ol class='bd-info'>";
+		for (var i = 0; i < infos.length; i++) {
+			div = div + "<li>" + infos[i] + "</li>";
+		}
+		div += "</ol>";
+	}
+
+	$("#display-info").html(div);
 }
 
 function clearInfo(){
